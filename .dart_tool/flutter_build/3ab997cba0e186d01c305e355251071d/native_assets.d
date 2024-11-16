@@ -1,0 +1,1 @@
+ /Users/fumito/work/Muran2024/03_iPadPathMaker/PathMakerMuran2024/.dart_tool/flutter_build/3ab997cba0e186d01c305e355251071d/native_assets.yaml: 
