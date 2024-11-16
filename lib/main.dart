@@ -13,6 +13,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   List<Arrow> arrows = [];
+  Color selectedColor = Colors.red;
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +25,10 @@ class _MyAppState extends State<MyApp> {
         body: Column(
           children: [
             Expanded(
-              flex: 1, // 左右の幅を3:1に設定
-
+              // 色選択ボタンの行
+              flex: 1, // Column 1:5:1の比率で分割
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
                     child: const Text(''),
@@ -35,13 +37,15 @@ class _MyAppState extends State<MyApp> {
                       foregroundColor: Colors.white,
                       shape: const CircleBorder(
                         side: BorderSide(
-                          color: Colors.black,
+                          color: Colors.white,
                           width: 1,
                           style: BorderStyle.solid,
                         ),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      selectedColor = Colors.red;
+                    },
                   ),
                   ElevatedButton(
                     child: const Text(''),
@@ -50,13 +54,15 @@ class _MyAppState extends State<MyApp> {
                       foregroundColor: Colors.white,
                       shape: const CircleBorder(
                         side: BorderSide(
-                          color: Colors.black,
+                          color: Colors.white,
                           width: 1,
                           style: BorderStyle.solid,
                         ),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      selectedColor = Colors.blue;
+                    },
                   ),
                   ElevatedButton(
                     child: const Text(''),
@@ -65,13 +71,15 @@ class _MyAppState extends State<MyApp> {
                       foregroundColor: Colors.white,
                       shape: const CircleBorder(
                         side: BorderSide(
-                          color: Colors.black,
+                          color: Colors.white,
                           width: 1,
                           style: BorderStyle.solid,
                         ),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      selectedColor = Colors.green;
+                    },
                   ),
                 ],
               ),
@@ -92,22 +100,24 @@ class _MyAppState extends State<MyApp> {
                           Offset position = details.localPosition;
                           int x = (position.dx / cellSize).floor();
                           int y = (position.dy / cellSize).floor();
-                          if (x >= 0 && x < 32 && y >= 0 && y < 32) {
+                          if (x > 0 && x < 31 && y > 0 && y < 31) {
                             arrows.add(Arrow(x, y, details.delta));
                           }
                         });
                       },
                       child: CustomPaint(
                         size: Size(gridSize, gridSize),
-                        painter:
-                            GridPainter(cellSize: cellSize, arrows: arrows),
+                        painter: GridPainter(
+                            cellSize: cellSize,
+                            arrows: arrows,
+                            selectedColor: selectedColor),
                       ),
                     );
                   },
                 ),
               ),
             ),
-            // 下側のスタートボタン
+            // リセット & スタートボタン
             Expanded(
               flex: 1,
               child: Column(
@@ -154,8 +164,12 @@ class Arrow {
 class GridPainter extends CustomPainter {
   final double cellSize;
   final List<Arrow> arrows;
+  Color selectedColor;
 
-  GridPainter({required this.cellSize, required this.arrows});
+  GridPainter(
+      {required this.cellSize,
+      required this.arrows,
+      required this.selectedColor});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -191,47 +205,67 @@ class GridPainter extends CustomPainter {
 
     // 矢印を描画
     final arrowPaint = Paint()
-      ..color = Colors.red
+      ..color = selectedColor
       ..style = PaintingStyle.fill;
-
+    print("Start drawing arrows");
     for (Arrow arrow in arrows) {
-      double arrowX = arrow.x * cellSize;
-      double arrowY = arrow.y * cellSize;
+      if (arrow.direction.dx.abs() > 1.0 || arrow.direction.dy.abs() > 1.0) {
+        print(
+            'Arrow at (${arrow.x}, ${arrow.y}) with direction ${arrow.direction}');
+        double arrowX = arrow.x * cellSize;
+        double arrowY = arrow.y * cellSize;
 
-      Path path = Path();
-      if (arrow.direction.dx.abs() > arrow.direction.dy.abs()) {
-        // 水平方向の矢印
-        if (arrow.direction.dx > 0) {
-          // 右向き
-          path.moveTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.5);
-          path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.5);
-          path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.3);
-          path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.7);
+        Path path = Path();
+        if (arrow.direction.dx.abs() > arrow.direction.dy.abs()) {
+          // 水平方向の矢印
+          if (arrow.direction.dx > 0) {
+            // 右向き
+            path.moveTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.4);
+            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.4);
+            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.2);
+            path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.5);
+            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.8);
+            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.6);
+            path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.6);
+            path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.4);
+          } else {
+            // 左向き
+            path.moveTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.4);
+            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.4);
+            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.2);
+            path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.5);
+            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.8);
+            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.6);
+            path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.6);
+            path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.4);
+          }
         } else {
-          // 左向き
-          path.moveTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.5);
-          path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.5);
-          path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.3);
-          path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.7);
+          // 垂直方向の矢印
+          if (arrow.direction.dy > 0) {
+            // 下向き
+            path.moveTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.2);
+            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.6);
+            path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.6);
+            path.lineTo(arrowX + cellSize * 0.5, arrowY + cellSize * 0.8);
+            path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.6);
+            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.6);
+            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.2);
+            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.2);
+          } else {
+            // 上向き
+            path.moveTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.8);
+            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.4);
+            path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.4);
+            path.lineTo(arrowX + cellSize * 0.5, arrowY + cellSize * 0.2);
+            path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.4);
+            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.4);
+            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.8);
+            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.8);
+          }
         }
-      } else {
-        // 垂直方向の矢印
-        if (arrow.direction.dy > 0) {
-          // 下向き
-          path.moveTo(arrowX + cellSize * 0.5, arrowY + cellSize * 0.2);
-          path.lineTo(arrowX + cellSize * 0.5, arrowY + cellSize * 0.8);
-          path.lineTo(arrowX + cellSize * 0.3, arrowY + cellSize * 0.6);
-          path.lineTo(arrowX + cellSize * 0.7, arrowY + cellSize * 0.6);
-        } else {
-          // 上向き
-          path.moveTo(arrowX + cellSize * 0.5, arrowY + cellSize * 0.8);
-          path.lineTo(arrowX + cellSize * 0.5, arrowY + cellSize * 0.2);
-          path.lineTo(arrowX + cellSize * 0.3, arrowY + cellSize * 0.4);
-          path.lineTo(arrowX + cellSize * 0.7, arrowY + cellSize * 0.4);
-        }
+        path.close();
+        canvas.drawPath(path, arrowPaint);
       }
-      path.close();
-      canvas.drawPath(path, arrowPaint);
     }
   }
 
