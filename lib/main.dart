@@ -47,6 +47,7 @@ class _MyAppState extends State<MyApp> {
                       selectedColor = Colors.red;
                     },
                   ),
+                  SizedBox(width: 16), // ボタン間のスペース
                   ElevatedButton(
                     child: const Text(''),
                     style: ElevatedButton.styleFrom(
@@ -64,6 +65,7 @@ class _MyAppState extends State<MyApp> {
                       selectedColor = Colors.blue;
                     },
                   ),
+                  SizedBox(width: 16), // ボタン間のスペース
                   ElevatedButton(
                     child: const Text(''),
                     style: ElevatedButton.styleFrom(
@@ -97,11 +99,24 @@ class _MyAppState extends State<MyApp> {
                     return GestureDetector(
                       onPanUpdate: (details) {
                         setState(() {
+                          // タッチされたマス目を特定
                           Offset position = details.localPosition;
                           int x = (position.dx / cellSize).floor();
                           int y = (position.dy / cellSize).floor();
+                          // 外周には描画しない
                           if (x > 0 && x < 31 && y > 0 && y < 31) {
-                            arrows.add(Arrow(x, y, details.delta));
+                            //セルの中心から距離がセルサイズの0.5倍未満の場合のみ矢印を描画
+                            double cell_x = position.dx - (x + 0.5) * cellSize;
+                            double cell_y = position.dy - (y + 0.5) * cellSize;
+                            if (cell_x * cell_x + cell_y * cell_y <
+                                cellSize * cellSize * 0.5 * 0.5) {
+                              // 変化量が小さすぎる場合は無視
+                              print(details.delta);
+                              if (details.delta.dx.abs() > 1.5 ||
+                                  details.delta.dy.abs() > 1.5) {
+                                arrows.add(Arrow(x, y, details.delta));
+                              }
+                            }
                           }
                         });
                       },
@@ -126,6 +141,7 @@ class _MyAppState extends State<MyApp> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // リセットボタン
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
@@ -135,6 +151,7 @@ class _MyAppState extends State<MyApp> {
                         child: Text('リセット'),
                       ),
                       SizedBox(width: 16), // ボタン間のスペース
+                      // スタートボタン
                       ElevatedButton(
                         onPressed: () {
                           // スタートボタンが押されたときの処理
@@ -164,7 +181,7 @@ class Arrow {
 class GridPainter extends CustomPainter {
   final double cellSize;
   final List<Arrow> arrows;
-  Color selectedColor;
+  final Color selectedColor;
 
   GridPainter(
       {required this.cellSize,
@@ -207,11 +224,9 @@ class GridPainter extends CustomPainter {
     final arrowPaint = Paint()
       ..color = selectedColor
       ..style = PaintingStyle.fill;
-    print("Start drawing arrows");
+
     for (Arrow arrow in arrows) {
       if (arrow.direction.dx.abs() > 1.0 || arrow.direction.dy.abs() > 1.0) {
-        print(
-            'Arrow at (${arrow.x}, ${arrow.y}) with direction ${arrow.direction}');
         double arrowX = arrow.x * cellSize;
         double arrowY = arrow.y * cellSize;
 
