@@ -1,6 +1,10 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:io';
+
+const int mouceNum = 3;
+const List<Color> mouceColors = [Colors.red, Colors.blue, Colors.green];
 
 void main() {
   runApp(MyApp());
@@ -12,28 +16,27 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Arrow> arrows = [];
-  Color selectedColor = Colors.red;
+  List<List<Arrow>> arrowsAll = List.generate(3, (_) => []);
+  int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('電光石火ぴかぴかクリーナーズ'),
+          title: const Text('電光石火ぴかぴかクリーナーズ'),
         ),
         body: Column(
           children: [
+            // 色選択ボタンの行
             Expanded(
-              // 色選択ボタンの行
               flex: 1, // Column 1:5:1の比率で分割
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    child: const Text(''),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: mouceColors[0],
                       foregroundColor: Colors.white,
                       shape: const CircleBorder(
                         side: BorderSide(
@@ -44,14 +47,14 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ),
                     onPressed: () {
-                      selectedColor = Colors.red;
+                      selectedIndex = 0;
                     },
+                    child: const Text(''),
                   ),
-                  SizedBox(width: 16), // ボタン間のスペース
+                  const SizedBox(width: 16), // ボタン間のスペース
                   ElevatedButton(
-                    child: const Text(''),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: mouceColors[1],
                       foregroundColor: Colors.white,
                       shape: const CircleBorder(
                         side: BorderSide(
@@ -62,14 +65,14 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ),
                     onPressed: () {
-                      selectedColor = Colors.blue;
+                      selectedIndex = 1;
                     },
+                    child: const Text(''),
                   ),
-                  SizedBox(width: 16), // ボタン間のスペース
+                  const SizedBox(width: 16), // ボタン間のスペース
                   ElevatedButton(
-                    child: const Text(''),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: mouceColors[2],
                       foregroundColor: Colors.white,
                       shape: const CircleBorder(
                         side: BorderSide(
@@ -80,8 +83,9 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ),
                     onPressed: () {
-                      selectedColor = Colors.green;
+                      selectedIndex = 2;
                     },
+                    child: const Text(''),
                   ),
                 ],
               ),
@@ -99,22 +103,53 @@ class _MyAppState extends State<MyApp> {
                     return GestureDetector(
                       onPanUpdate: (details) {
                         setState(() {
+                          // 初期位置を設定
+                          if (arrowsAll[0].isEmpty) {
+                            arrowsAll[0].add(Arrow(1, 1, details.delta));
+                          }
+                          if (arrowsAll[1].isEmpty) {
+                            arrowsAll[1].add(Arrow(1, 30, details.delta));
+                          }
+                          if (arrowsAll[2].isEmpty) {
+                            arrowsAll[2].add(Arrow(30, 1, details.delta));
+                          }
                           // タッチされたマス目を特定
                           Offset position = details.localPosition;
                           int x = (position.dx / cellSize).floor();
                           int y = (position.dy / cellSize).floor();
+                          // selectedIndexを特定
+                          if (arrowsAll[0].last.x == x &&
+                              arrowsAll[0].last.y == y) {
+                            selectedIndex = 0;
+                          } else if (arrowsAll[1].last.x == x &&
+                              arrowsAll[1].last.y == y) {
+                            selectedIndex = 1;
+                          } else if (arrowsAll[2].last.x == x &&
+                              arrowsAll[2].last.y == y) {
+                            selectedIndex = 2;
+                          }
+
                           // 外周には描画しない
                           if (x > 0 && x < 31 && y > 0 && y < 31) {
-                            //セルの中心から距離がセルサイズの0.5倍未満の場合のみ矢印を描画
-                            double cell_x = position.dx - (x + 0.5) * cellSize;
-                            double cell_y = position.dy - (y + 0.5) * cellSize;
-                            if (cell_x * cell_x + cell_y * cell_y <
-                                cellSize * cellSize * 0.5 * 0.5) {
-                              // 変化量が小さすぎる場合は無視
-                              print(details.delta);
-                              if (details.delta.dx.abs() > 1.5 ||
-                                  details.delta.dy.abs() > 1.5) {
-                                arrows.add(Arrow(x, y, details.delta));
+                            // 最終地点と隣接するセルにのみ移動可能
+                            Arrow lastArrow = arrowsAll[selectedIndex].last;
+                            if ((x != lastArrow.x || y != lastArrow.y) &&
+                                (x - lastArrow.x).abs() <= 1 &&
+                                (y - lastArrow.y).abs() <= 1) {
+                              arrowsAll[selectedIndex]
+                                  .add(Arrow(x, y, details.delta));
+                              //セルの中心からの距離が0.5倍未満の場合のみ矢印を描画
+                              double cellX = position.dx - (x + 0.5) * cellSize;
+                              double cellY = position.dy - (y + 0.5) * cellSize;
+                              if (cellX * cellX + cellY * cellY <
+                                  cellSize * cellSize * 0.5 * 0.5) {
+                                // 変化量が小さすぎる場合は無視
+                                print(details.delta);
+                                if (details.delta.dx.abs() > 1.5 ||
+                                    details.delta.dy.abs() > 1.5) {
+                                  arrowsAll[selectedIndex]
+                                      .add(Arrow(x, y, details.delta));
+                                }
                               }
                             }
                           }
@@ -124,8 +159,8 @@ class _MyAppState extends State<MyApp> {
                         size: Size(gridSize, gridSize),
                         painter: GridPainter(
                             cellSize: cellSize,
-                            arrows: arrows,
-                            selectedColor: selectedColor),
+                            arrowsAll: arrowsAll,
+                            selectedIndex: selectedIndex),
                       ),
                     );
                   },
@@ -145,16 +180,20 @@ class _MyAppState extends State<MyApp> {
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            arrows.clear();
+                            arrowsAll[0].clear();
+                            arrowsAll[1].clear();
+                            arrowsAll[2].clear();
                           });
                         },
-                        child: Text('リセット'),
+                        child: const Text('リセット'),
                       ),
-                      SizedBox(width: 16), // ボタン間のスペース
+                      const SizedBox(width: 16), // ボタン間のスペース
                       // スタートボタン
                       ElevatedButton(
                         onPressed: () {
                           // スタートボタンが押されたときの処理
+                          print('Start button pressed');
+                          sendArrows();
                         },
                         child: Text('スタート'),
                       ),
@@ -168,6 +207,28 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
+  void sendArrows() async {
+    final ip = '192.168.251.3'; // ここにIPアドレスを入力
+    final port = 1235; // ここにポート番号を入力
+    try {
+      final socket =
+          await Socket.connect(ip, port, timeout: Duration(seconds: 5));
+      final body = jsonEncode(
+          arrowsAll.map((arrow) => arrow[selectedIndex].toJson()).toList());
+
+      try {
+        socket.write(body);
+        await socket.flush();
+        socket.close();
+        print('Data sent successfully');
+      } catch (e) {
+        print('Error while sending data: $e');
+      }
+    } catch (e) {
+      print('Error connecting to server: $e');
+    }
+  }
 }
 
 class Arrow {
@@ -176,17 +237,23 @@ class Arrow {
   final Offset direction;
 
   Arrow(this.x, this.y, this.direction);
+  Map<String, dynamic> toJson() => {
+        'x': x,
+        'y': y,
+        'dx': direction.dx,
+        'dy': direction.dy,
+      };
 }
 
 class GridPainter extends CustomPainter {
   final double cellSize;
-  final List<Arrow> arrows;
-  final Color selectedColor;
+  final List<List<Arrow>> arrowsAll;
+  final int selectedIndex;
 
   GridPainter(
       {required this.cellSize,
-      required this.arrows,
-      required this.selectedColor});
+      required this.arrowsAll,
+      required this.selectedIndex});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -221,65 +288,68 @@ class GridPainter extends CustomPainter {
         fillPaint);
 
     // 矢印を描画
-    final arrowPaint = Paint()
-      ..color = selectedColor
-      ..style = PaintingStyle.fill;
+    for (int i = 0; i < arrowsAll.length; i++) {
+      final arrowPaint = Paint()
+        ..color = mouceColors[i]
+        ..style = PaintingStyle.fill;
+      for (int j = 0; j < arrowsAll[i].length - 1; j++) {
+        if (arrowsAll[i][j].direction.dx.abs() > 1.0 ||
+            arrowsAll[i][j].direction.dy.abs() > 1.0) {
+          double arrowX = arrowsAll[i][j].x * cellSize;
+          double arrowY = arrowsAll[i][j].y * cellSize;
 
-    for (Arrow arrow in arrows) {
-      if (arrow.direction.dx.abs() > 1.0 || arrow.direction.dy.abs() > 1.0) {
-        double arrowX = arrow.x * cellSize;
-        double arrowY = arrow.y * cellSize;
-
-        Path path = Path();
-        if (arrow.direction.dx.abs() > arrow.direction.dy.abs()) {
-          // 水平方向の矢印
-          if (arrow.direction.dx > 0) {
-            // 右向き
-            path.moveTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.4);
-            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.4);
-            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.2);
-            path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.5);
-            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.8);
-            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.6);
-            path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.6);
-            path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.4);
+          Path path = Path();
+          if (arrowsAll[i][j].direction.dx.abs() >
+              arrowsAll[i][j].direction.dy.abs()) {
+            // 水平方向の矢印
+            if (arrowsAll[i][j].direction.dx > 0) {
+              // 右向き
+              path.moveTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.4);
+              path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.4);
+              path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.2);
+              path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.5);
+              path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.8);
+              path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.6);
+              path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.6);
+              path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.4);
+            } else {
+              // 左向き
+              path.moveTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.4);
+              path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.4);
+              path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.2);
+              path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.5);
+              path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.8);
+              path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.6);
+              path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.6);
+              path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.4);
+            }
           } else {
-            // 左向き
-            path.moveTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.4);
-            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.4);
-            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.2);
-            path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.5);
-            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.8);
-            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.6);
-            path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.6);
-            path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.4);
+            // 垂直方向の矢印
+            if (arrowsAll[i][j].direction.dy > 0) {
+              // 下向き
+              path.moveTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.2);
+              path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.6);
+              path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.6);
+              path.lineTo(arrowX + cellSize * 0.5, arrowY + cellSize * 0.8);
+              path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.6);
+              path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.6);
+              path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.2);
+              path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.2);
+            } else {
+              // 上向き
+              path.moveTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.8);
+              path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.4);
+              path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.4);
+              path.lineTo(arrowX + cellSize * 0.5, arrowY + cellSize * 0.2);
+              path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.4);
+              path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.4);
+              path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.8);
+              path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.8);
+            }
           }
-        } else {
-          // 垂直方向の矢印
-          if (arrow.direction.dy > 0) {
-            // 下向き
-            path.moveTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.2);
-            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.6);
-            path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.6);
-            path.lineTo(arrowX + cellSize * 0.5, arrowY + cellSize * 0.8);
-            path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.6);
-            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.6);
-            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.2);
-            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.2);
-          } else {
-            // 上向き
-            path.moveTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.8);
-            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.4);
-            path.lineTo(arrowX + cellSize * 0.2, arrowY + cellSize * 0.4);
-            path.lineTo(arrowX + cellSize * 0.5, arrowY + cellSize * 0.2);
-            path.lineTo(arrowX + cellSize * 0.8, arrowY + cellSize * 0.4);
-            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.4);
-            path.lineTo(arrowX + cellSize * 0.6, arrowY + cellSize * 0.8);
-            path.lineTo(arrowX + cellSize * 0.4, arrowY + cellSize * 0.8);
-          }
+          path.close();
+          canvas.drawPath(path, arrowPaint);
         }
-        path.close();
-        canvas.drawPath(path, arrowPaint);
       }
     }
   }
