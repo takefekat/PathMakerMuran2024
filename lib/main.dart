@@ -66,51 +66,46 @@ class _MyAppState extends State<MyApp> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // リセットボタン
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            arrowsAll[0].clear();
-                            arrowsAll[1].clear();
-                            arrowsAll[2].clear();
-                          });
-                        },
-                        child: const Text('リセット'),
-                      ),
-                      const SizedBox(width: 16), // ボタン間のスペース
-                      // 決定ボタン
-                      ElevatedButton(
-                        onPressed: () {
-                          // 決定ボタンが押されたときの処理
-                          print('決定 button pressed');
-                          sendArrows();
-                        },
-                        child: Text('経路決定'),
-                      ),
-                      const SizedBox(width: 16), // ボタン間のスペース
-                      // スタートボタン
-                      ElevatedButton(
-                        onPressed: () {
-                          // スタートボタンが押されたときの処理
-                          print('Start button pressed');
-                          sendMsg('start');
-                        },
-                        child: Text('スタート'),
-                      ),
-                      const SizedBox(width: 16), // ボタン間のスペース
-                      // ストップボタン
-                      ElevatedButton(
-                        onPressed: () {
-                          // ストップボタンが押されたときの処理
-                          print('Start button pressed');
-                          sendMsg('stop');
-                        },
-                        child: Text('ストップ'),
-                      ),
-                    ],
+                  // リセットボタン
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        arrowsAll[0].clear();
+                        arrowsAll[1].clear();
+                        arrowsAll[2].clear();
+                      });
+                    },
+                    child: const Text('リセット'),
+                  ),
+                  const SizedBox(width: 16), // ボタン間のスペース
+                  // 決定ボタン
+                  ElevatedButton(
+                    onPressed: () {
+                      // 決定ボタンが押されたときの処理
+                      print('決定 button pressed');
+                      sendArrows();
+                    },
+                    child: Text('経路決定'),
+                  ),
+                  const SizedBox(width: 16), // ボタン間のスペース
+                  // スタートボタン
+                  ElevatedButton(
+                    onPressed: () {
+                      // スタートボタンが押されたときの処理
+                      print('Start button pressed');
+                      sendMsg('start');
+                    },
+                    child: Text('スタート'),
+                  ),
+                  const SizedBox(width: 16), // ボタン間のスペース
+                  // ストップボタン
+                  ElevatedButton(
+                    onPressed: () {
+                      // ストップボタンが押されたときの処理
+                      print('Start button pressed');
+                      sendMsg('stop');
+                    },
+                    child: Text('ストップ'),
                   ),
                 ],
               ),
@@ -202,54 +197,49 @@ class _MyAppState extends State<MyApp> {
             // リセット & スタートボタン
             Expanded(
               flex: 1,
-              child: Column(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // リセットボタン
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            arrowsAll[0].clear();
-                            arrowsAll[1].clear();
-                            arrowsAll[2].clear();
-                          });
-                        },
-                        child: const Text('リセット'),
-                      ),
-                      const SizedBox(width: 16), // ボタン間のスペース
-                      // 決定ボタン
-                      ElevatedButton(
-                        onPressed: () {
-                          // 決定ボタンが押されたときの処理
-                          print('決定 button pressed');
-                          sendArrows();
-                        },
-                        child: Text('経路決定'),
-                      ),
-                      const SizedBox(width: 16), // ボタン間のスペース
-                      // スタートボタン
-                      ElevatedButton(
-                        onPressed: () {
-                          // スタートボタンが押されたときの処理
-                          print('Start button pressed');
-                          sendMsg('start');
-                        },
-                        child: Text('スタート'),
-                      ),
-                      const SizedBox(width: 16), // ボタン間のスペース
-                      // ストップボタン
-                      ElevatedButton(
-                        onPressed: () {
-                          // ストップボタンが押されたときの処理
-                          print('Start button pressed');
-                          sendMsg('stop');
-                        },
-                        child: Text('ストップ'),
-                      ),
-                    ],
+                  // リセットボタン
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        arrowsAll[0].clear();
+                        arrowsAll[1].clear();
+                        arrowsAll[2].clear();
+                      });
+                    },
+                    child: const Text('リセット'),
+                  ),
+                  const SizedBox(width: 16), // ボタン間のスペース
+                  // 決定ボタン
+                  ElevatedButton(
+                    onPressed: () {
+                      // 決定ボタンが押されたときの処理
+                      print('決定 button pressed');
+                      sendArrows();
+                    },
+                    child: Text('経路決定'),
+                  ),
+                  const SizedBox(width: 16), // ボタン間のスペース
+                  // スタートボタン
+                  ElevatedButton(
+                    onPressed: () {
+                      // スタートボタンが押されたときの処理
+                      print('Start button pressed');
+                      sendMsg('start');
+                    },
+                    child: Text('スタート'),
+                  ),
+                  const SizedBox(width: 16), // ボタン間のスペース
+                  // ストップボタン
+                  ElevatedButton(
+                    onPressed: () {
+                      // ストップボタンが押されたときの処理
+                      print('Start button pressed');
+                      sendMsg('stop');
+                    },
+                    child: Text('ストップ'),
                   ),
                 ],
               ),
