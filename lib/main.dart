@@ -50,15 +50,18 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         body: Row(
           children: [
-            // 32x32のマス目状の盤面
-            FieldWidget(
-              arrowsAll: arrowsAll,
-              selectedIndex: selectedIndex,
-              onSelectedIndexChanged: (index) {
-                setState(() {
-                  selectedIndex = index;
-                });
-              },
+            Expanded(
+              flex: 3,
+              // 32x32のマス目状の盤面
+              child: FieldWidget(
+                arrowsAll: arrowsAll,
+                selectedIndex: selectedIndex,
+                onSelectedIndexChanged: (index) {
+                  setState(() {
+                    selectedIndex = index;
+                  });
+                },
+              ),
             ),
             // リセット & スタートボタン
             Expanded(
@@ -185,14 +188,17 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
             // 32x32のマス目状の盤面
-            FieldWidget(
-              arrowsAll: arrowsAll,
-              selectedIndex: selectedIndex,
-              onSelectedIndexChanged: (index) {
-                setState(() {
-                  selectedIndex = index;
-                });
-              },
+            Expanded(
+              flex: 6,
+              child: FieldWidget(
+                arrowsAll: arrowsAll,
+                selectedIndex: selectedIndex,
+                onSelectedIndexChanged: (index) {
+                  setState(() {
+                    selectedIndex = index;
+                  });
+                },
+              ),
             ),
             // リセット & スタートボタン
             Expanded(

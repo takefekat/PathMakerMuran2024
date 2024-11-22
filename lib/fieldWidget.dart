@@ -7,6 +7,8 @@ class FieldWidget extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onSelectedIndexChanged;
 
+  double simTime = 0;
+
   FieldWidget({
     required this.arrowsAll,
     required this.selectedIndex,
@@ -17,60 +19,80 @@ class FieldWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(24.0), // 余白を追加
-      child: AspectRatio(
-        aspectRatio: 1.0, // 正方形に設定
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            double gridSize = min(constraints.maxWidth, constraints.maxHeight);
-            double cellSize = gridSize / 32;
-            return GestureDetector(
-              onPanUpdate: (details) {
-                // タッチされたマス目を特定
-                Offset position = details.localPosition;
-                int x = (position.dx / cellSize).floor();
-                int y = (position.dy / cellSize).floor();
+      child: Column(
+        children: [
+          Expanded(
+            child: AspectRatio(
+              aspectRatio: 1.0, // 正方形に設定
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  double gridSize =
+                      min(constraints.maxWidth, constraints.maxHeight);
+                  double cellSize = gridSize / 32;
+                  return GestureDetector(
+                    onPanUpdate: (details) {
+                      // タッチされたマス目を特定
+                      Offset position = details.localPosition;
+                      int x = (position.dx / cellSize).floor();
+                      int y = (position.dy / cellSize).floor();
 
-                // 外周には描画しない
-                if (x > 0 && x < 31 && y > 0 && y < 31) {
-                  // 一度通過済みのセルの場合はそれ以降の経路をリセット
-                  for (int i = 0; i < arrowsAll.length; i++) {
-                    for (int j = 0; j < arrowsAll[i].length; j++) {
-                      if (arrowsAll[i][j].x == x && arrowsAll[i][j].y == y) {
-                        arrowsAll[i].removeRange(j + 1, arrowsAll[i].length);
-                        break;
+                      // 外周には描画しない
+                      if (x > 0 && x < 31 && y > 0 && y < 31) {
+                        // 一度通過済みのセルの場合はそれ以降の経路をリセット
+                        for (int i = 0; i < arrowsAll.length; i++) {
+                          for (int j = 0; j < arrowsAll[i].length; j++) {
+                            if (arrowsAll[i][j].x == x &&
+                                arrowsAll[i][j].y == y) {
+                              arrowsAll[i]
+                                  .removeRange(j + 1, arrowsAll[i].length);
+                              break;
+                            }
+                          }
+                        }
+
+                        // selectedIndexを特定
+                        if (arrowsAll[0].last.x == x &&
+                            arrowsAll[0].last.y == y) {
+                          onSelectedIndexChanged(0);
+                        } else if (arrowsAll[1].last.x == x &&
+                            arrowsAll[1].last.y == y) {
+                          onSelectedIndexChanged(1);
+                        } else if (arrowsAll[2].last.x == x &&
+                            arrowsAll[2].last.y == y) {
+                          onSelectedIndexChanged(2);
+                        }
+
+                        // 経路末尾と隣接するセルにのみ移動可能
+                        Arrow lastArrow = arrowsAll[selectedIndex].last;
+                        if ((x - lastArrow.x).abs() + (y - lastArrow.y).abs() ==
+                            1) {
+                          arrowsAll[selectedIndex]
+                              .add(Arrow(x, y, details.delta));
+                        }
                       }
-                    }
-                  }
-
-                  // selectedIndexを特定
-                  if (arrowsAll[0].last.x == x && arrowsAll[0].last.y == y) {
-                    onSelectedIndexChanged(0);
-                  } else if (arrowsAll[1].last.x == x &&
-                      arrowsAll[1].last.y == y) {
-                    onSelectedIndexChanged(1);
-                  } else if (arrowsAll[2].last.x == x &&
-                      arrowsAll[2].last.y == y) {
-                    onSelectedIndexChanged(2);
-                  }
-
-                  // 経路末尾と隣接するセルにのみ移動可能
-                  Arrow lastArrow = arrowsAll[selectedIndex].last;
-                  if ((x - lastArrow.x).abs() + (y - lastArrow.y).abs() == 1) {
-                    arrowsAll[selectedIndex].add(Arrow(x, y, details.delta));
-                  }
-                }
-              },
-              child: CustomPaint(
-                size: Size(gridSize, gridSize),
-                painter: GridPainter(
-                  cellSize: cellSize,
-                  arrowsAll: arrowsAll,
-                  selectedIndex: selectedIndex,
-                ),
+                    },
+                    child: CustomPaint(
+                      size: Size(gridSize, gridSize),
+                      painter: GridPainter(
+                        cellSize: cellSize,
+                        arrowsAll: arrowsAll,
+                        selectedIndex: selectedIndex,
+                        simTime: simTime,
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
+            ),
+          ),
+          // シミュレーションシークバー
+          ChangeForm(
+            simTime: simTime,
+            onSimTimeChanged: (e) {
+              simTime = e;
+            },
+          ),
+        ],
       ),
     );
   }
@@ -112,11 +134,13 @@ class GridPainter extends CustomPainter {
   final double cellSize;
   final List<List<Arrow>> arrowsAll;
   final int selectedIndex;
+  final double simTime;
 
   GridPainter(
       {required this.cellSize,
       required this.arrowsAll,
-      required this.selectedIndex});
+      required this.selectedIndex,
+      required this.simTime});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -236,5 +260,48 @@ class GridPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
+  }
+}
+
+class ChangeForm extends StatefulWidget {
+  final double simTime;
+  final ValueChanged<double> onSimTimeChanged;
+
+  ChangeForm({required this.simTime, required this.onSimTimeChanged});
+
+  @override
+  _ChangeFormState createState() => _ChangeFormState();
+}
+
+class _ChangeFormState extends State<ChangeForm> {
+  double _value = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.simTime;
+  }
+
+  void _changeSlider(double e) {
+    setState(() {
+      _value = e;
+    });
+    widget.onSimTimeChanged(e);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Slider(
+        label: '${_value.toStringAsFixed(1)}', // 小数点以下1桁まで表示
+        min: 0,
+        max: 60, // 60sまで
+        value: _value,
+        activeColor: const Color.fromARGB(255, 220, 0, 50),
+        inactiveColor: Colors.grey,
+        divisions: 60 * 10, // 0.1sごとに分割
+        onChanged: _changeSlider,
+      ),
+    );
   }
 }
