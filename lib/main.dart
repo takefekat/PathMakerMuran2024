@@ -21,6 +21,16 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var orientation = MediaQuery.of(context).orientation;
+    // 初期位置を設定
+    if (arrowsAll[0].isEmpty) {
+      arrowsAll[0].add(Arrow(1, 1, const Offset(0, 0)));
+    }
+    if (arrowsAll[1].isEmpty) {
+      arrowsAll[1].add(Arrow(1, 30, const Offset(0, 0)));
+    }
+    if (arrowsAll[2].isEmpty) {
+      arrowsAll[2].add(Arrow(30, 1, const Offset(0, 0)));
+    }
     return MaterialApp(
       home: Scaffold(
         // フィールドが小さくなるので、消す。
@@ -34,6 +44,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  // 横向きのレイアウト
   Widget _buildLandscapeLayout() {
     return MaterialApp(
       home: Scaffold(
@@ -110,6 +121,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  // 縦向きのレイアウト
   Widget _buildPortraitLayout() {
     return MaterialApp(
       home: Scaffold(

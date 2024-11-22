@@ -26,16 +26,7 @@ class FieldWidget extends StatelessWidget {
             return GestureDetector(
               onPanUpdate: (details) {
                 onSelectedIndexChanged(selectedIndex);
-                // 初期位置を設定
-                if (arrowsAll[0].isEmpty) {
-                  arrowsAll[0].add(Arrow(1, 1, details.delta));
-                }
-                if (arrowsAll[1].isEmpty) {
-                  arrowsAll[1].add(Arrow(1, 30, details.delta));
-                }
-                if (arrowsAll[2].isEmpty) {
-                  arrowsAll[2].add(Arrow(30, 1, details.delta));
-                }
+
                 // タッチされたマス目を特定
                 Offset position = details.localPosition;
                 int x = (position.dx / cellSize).floor();
