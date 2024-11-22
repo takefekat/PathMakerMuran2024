@@ -25,41 +25,38 @@ class FieldWidget extends StatelessWidget {
             double cellSize = gridSize / 32;
             return GestureDetector(
               onPanUpdate: (details) {
-                onSelectedIndexChanged(selectedIndex);
-
                 // タッチされたマス目を特定
                 Offset position = details.localPosition;
                 int x = (position.dx / cellSize).floor();
                 int y = (position.dy / cellSize).floor();
-                // selectedIndexを特定
-                if (arrowsAll[0].last.x == x && arrowsAll[0].last.y == y) {
-                  onSelectedIndexChanged(0);
-                } else if (arrowsAll[1].last.x == x &&
-                    arrowsAll[1].last.y == y) {
-                  onSelectedIndexChanged(1);
-                } else if (arrowsAll[2].last.x == x &&
-                    arrowsAll[2].last.y == y) {
-                  onSelectedIndexChanged(2);
-                }
 
                 // 外周には描画しない
                 if (x > 0 && x < 31 && y > 0 && y < 31) {
-                  // 最終地点と隣接するセルにのみ移動可能
-                  Arrow lastArrow = arrowsAll[selectedIndex].last;
-                  if ((x - lastArrow.x).abs() + (y - lastArrow.y).abs() == 1) {
-                    //セルの中心からの距離が0.5倍未満の場合のみ矢印を描画
-                    double cellX = position.dx - (x + 0.5) * cellSize;
-                    double cellY = position.dy - (y + 0.5) * cellSize;
-
-                    if (cellX.abs() * cellX.abs() + cellY.abs() * cellY.abs() <
-                        cellSize * cellSize * 0.7 * 0.7) {
-                      // 変化量が小さすぎる場合は無視
-                      if (details.delta.dx.abs() > 1.5 ||
-                          details.delta.dy.abs() > 1.5) {
-                        arrowsAll[selectedIndex]
-                            .add(Arrow(x, y, details.delta));
+                  // 一度通過済みのセルの場合はそれ以降の経路をリセット
+                  for (int i = 0; i < arrowsAll.length; i++) {
+                    for (int j = 0; j < arrowsAll[i].length; j++) {
+                      if (arrowsAll[i][j].x == x && arrowsAll[i][j].y == y) {
+                        arrowsAll[i].removeRange(j + 1, arrowsAll[i].length);
+                        break;
                       }
                     }
+                  }
+
+                  // selectedIndexを特定
+                  if (arrowsAll[0].last.x == x && arrowsAll[0].last.y == y) {
+                    onSelectedIndexChanged(0);
+                  } else if (arrowsAll[1].last.x == x &&
+                      arrowsAll[1].last.y == y) {
+                    onSelectedIndexChanged(1);
+                  } else if (arrowsAll[2].last.x == x &&
+                      arrowsAll[2].last.y == y) {
+                    onSelectedIndexChanged(2);
+                  }
+
+                  // 経路末尾と隣接するセルにのみ移動可能
+                  Arrow lastArrow = arrowsAll[selectedIndex].last;
+                  if ((x - lastArrow.x).abs() + (y - lastArrow.y).abs() == 1) {
+                    arrowsAll[selectedIndex].add(Arrow(x, y, details.delta));
                   }
                 }
               },
