@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'fieldWidget.dart';
+import 'dropDownButton.dart';
 import 'common.dart';
 
 void main() {
@@ -15,7 +16,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<List<Arrow>> arrowsAll = List.generate(3, (_) => []);
+  List<List<Arrow>> arrowsAll = List.generate(MOUSE_NUM, (_) => []);
+  List<int> moucePathMode = List.generate(MOUSE_NUM, (_) => 0);
   int selectedIndex = 0;
 
   @override
@@ -69,6 +71,46 @@ class _MyAppState extends State<MyApp> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  CustomDropdown(
+                    selectedValue: moucePathMode[0],
+                    mouceIndex: 0,
+                    onChanged: (int? value) {
+                      setState(() {
+                        moucePathMode[0] = value!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 32), // ボタン間のスペース
+                  CustomDropdown(
+                    selectedValue: moucePathMode[1],
+                    mouceIndex: 1,
+                    onChanged: (int? value) {
+                      setState(() {
+                        moucePathMode[1] = value!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 32), // ボタン間のスペース
+                  CustomDropdown(
+                    selectedValue: moucePathMode[2],
+                    mouceIndex: 2,
+                    onChanged: (int? value) {
+                      setState(() {
+                        moucePathMode[2] = value!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 32), // ボタン間のスペース
+                  CustomDropdown(
+                    selectedValue: moucePathMode[3],
+                    mouceIndex: 3,
+                    onChanged: (int? value) {
+                      setState(() {
+                        moucePathMode[3] = value!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 32), // ボタン間のスペース
                   // リセットボタン
                   ElevatedButton(
                     onPressed: () {
@@ -80,7 +122,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: const Text('リセット'),
                   ),
-                  const SizedBox(width: 16), // ボタン間のスペース
+                  const SizedBox(height: 32), // ボタン間のスペース
                   // 決定ボタン
                   ElevatedButton(
                     onPressed: () {
@@ -90,7 +132,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('経路決定'),
                   ),
-                  const SizedBox(width: 16), // ボタン間のスペース
+                  const SizedBox(height: 32), // ボタン間のスペース
                   // スタートボタン
                   ElevatedButton(
                     onPressed: () {
@@ -100,7 +142,7 @@ class _MyAppState extends State<MyApp> {
                     },
                     child: Text('スタート'),
                   ),
-                  const SizedBox(width: 16), // ボタン間のスペース
+                  const SizedBox(height: 32), // ボタン間のスペース
                   // ストップボタン
                   ElevatedButton(
                     onPressed: () {
@@ -127,69 +169,55 @@ class _MyAppState extends State<MyApp> {
           children: [
             // Auto / ボタンの行
             Expanded(
-              flex: 1, // Column 1:5:1の比率で分割
+              flex: 2, // Column 1:6:1の比率で分割
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: mouceColors[0],
-                      foregroundColor: Colors.white,
-                      shape: const CircleBorder(
-                        side: BorderSide(
-                          color: Colors.white,
-                          width: 1,
-                          style: BorderStyle.solid,
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      selectedIndex = 0;
+                  CustomDropdown(
+                    selectedValue: moucePathMode[0],
+                    mouceIndex: 0,
+                    onChanged: (int? value) {
+                      setState(() {
+                        moucePathMode[0] = value!;
+                      });
                     },
-                    child: const Text(''),
                   ),
                   const SizedBox(width: 16), // ボタン間のスペース
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: mouceColors[1],
-                      foregroundColor: Colors.white,
-                      shape: const CircleBorder(
-                        side: BorderSide(
-                          color: Colors.white,
-                          width: 1,
-                          style: BorderStyle.solid,
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      selectedIndex = 1;
+                  CustomDropdown(
+                    selectedValue: moucePathMode[1],
+                    mouceIndex: 1,
+                    onChanged: (int? value) {
+                      setState(() {
+                        moucePathMode[1] = value!;
+                      });
                     },
-                    child: const Text(''),
                   ),
                   const SizedBox(width: 16), // ボタン間のスペース
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: mouceColors[2],
-                      foregroundColor: Colors.white,
-                      shape: const CircleBorder(
-                        side: BorderSide(
-                          color: Colors.white,
-                          width: 1,
-                          style: BorderStyle.solid,
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      selectedIndex = 2;
+                  CustomDropdown(
+                    selectedValue: moucePathMode[2],
+                    mouceIndex: 2,
+                    onChanged: (int? value) {
+                      setState(() {
+                        moucePathMode[2] = value!;
+                      });
                     },
-                    child: const Text(''),
+                  ),
+                  const SizedBox(width: 16), // ボタン間のスペース
+                  CustomDropdown(
+                    selectedValue: moucePathMode[3],
+                    mouceIndex: 3,
+                    onChanged: (int? value) {
+                      setState(() {
+                        moucePathMode[3] = value!;
+                      });
+                    },
                   ),
                 ],
               ),
             ),
             // 32x32のマス目状の盤面
             Expanded(
-              flex: 6,
+              flex: 7,
               child: FieldWidget(
                 arrowsAll: arrowsAll,
                 selectedIndex: selectedIndex,
