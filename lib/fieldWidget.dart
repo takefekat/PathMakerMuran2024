@@ -28,7 +28,7 @@ class FieldWidget extends StatelessWidget {
                 builder: (context, constraints) {
                   double gridSize =
                       min(constraints.maxWidth, constraints.maxHeight);
-                  double cellSize = gridSize / 32;
+                  double cellSize = gridSize / MAZE_SIZE.toDouble();
                   return GestureDetector(
                     onPanUpdate: (details) {
                       // タッチされたマス目を特定
@@ -36,8 +36,11 @@ class FieldWidget extends StatelessWidget {
                       int x = (position.dx / cellSize).floor();
                       int y = (position.dy / cellSize).floor();
 
-                      // 外周には描画しない
-                      if (x > 0 && x < 31 && y > 0 && y < 31) {
+                      // if ((x > 0 && x < 31 && y > 0 && y < 31)) { // 32サイズの場合は外周には描画しない
+                      if ((x >= 0 &&
+                          x < MAZE_SIZE &&
+                          y >= 0 &&
+                          y < MAZE_SIZE)) {
                         // 一度通過済みのセルの場合はそれ以降の経路をリセット
                         for (int i = 0; i < arrowsAll.length; i++) {
                           for (int j = 0; j < arrowsAll[i].length; j++) {
@@ -60,6 +63,9 @@ class FieldWidget extends StatelessWidget {
                         } else if (arrowsAll[2].last.x == x &&
                             arrowsAll[2].last.y == y) {
                           onSelectedIndexChanged(2);
+                        } else if (arrowsAll[3].last.x == x &&
+                            arrowsAll[3].last.y == y) {
+                          onSelectedIndexChanged(3);
                         }
 
                         // 経路末尾と隣接するセルにのみ移動可能
@@ -141,7 +147,7 @@ class GridPainter extends CustomPainter {
       ..color = Colors.black
       ..style = PaintingStyle.stroke;
 
-    for (int i = 0; i <= 32; i++) {
+    for (int i = 0; i <= MAZE_SIZE; i++) {
       double offset = i * cellSize;
       // 縦線を描画
       canvas.drawLine(Offset(offset, 0), Offset(offset, size.height), paint);
@@ -150,23 +156,24 @@ class GridPainter extends CustomPainter {
     }
 
     // 外周を塗りつぶす
-    final fillPaint = Paint()
-      ..color = Colors.black
-      ..style = PaintingStyle.fill;
+    if (MAZE_SIZE == 32) {
+      final fillPaint = Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.fill;
 
-    // 上辺
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, cellSize), fillPaint);
-    // 下辺
-    canvas.drawRect(
-        Rect.fromLTWH(0, size.height - cellSize, size.width, cellSize),
-        fillPaint);
-    // 左辺
-    canvas.drawRect(Rect.fromLTWH(0, 0, cellSize, size.height), fillPaint);
-    // 右辺
-    canvas.drawRect(
-        Rect.fromLTWH(size.width - cellSize, 0, cellSize, size.height),
-        fillPaint);
-
+      // 上辺
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, cellSize), fillPaint);
+      // 下辺
+      canvas.drawRect(
+          Rect.fromLTWH(0, size.height - cellSize, size.width, cellSize),
+          fillPaint);
+      // 左辺
+      canvas.drawRect(Rect.fromLTWH(0, 0, cellSize, size.height), fillPaint);
+      // 右辺
+      canvas.drawRect(
+          Rect.fromLTWH(size.width - cellSize, 0, cellSize, size.height),
+          fillPaint);
+    }
     // 矢印を描画
     for (int i = 0; i < arrowsAll.length; i++) {
       final arrowPaint = Paint()

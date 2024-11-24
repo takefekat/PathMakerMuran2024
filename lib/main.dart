@@ -25,13 +25,17 @@ class _MyAppState extends State<MyApp> {
     var orientation = MediaQuery.of(context).orientation;
     // 初期位置を設定
     if (arrowsAll[0].isEmpty) {
-      arrowsAll[0].add(Arrow(1, 1, const Offset(0, 0)));
+      arrowsAll[0].add(Arrow(0, 0, const Offset(0, 0)));
+      // arrowsAll[0].add(Arrow(1, 1, const Offset(0, 0))); // 32x32の場合
     }
     if (arrowsAll[1].isEmpty) {
-      arrowsAll[1].add(Arrow(1, 30, const Offset(0, 0)));
+      arrowsAll[1].add(Arrow(0, MAZE_SIZE - 1, const Offset(0, 0)));
     }
     if (arrowsAll[2].isEmpty) {
-      arrowsAll[2].add(Arrow(30, 1, const Offset(0, 0)));
+      arrowsAll[2].add(Arrow(MAZE_SIZE - 1, 0, const Offset(0, 0)));
+    }
+    if (arrowsAll[3].isEmpty) {
+      arrowsAll[3].add(Arrow(MAZE_SIZE - 1, MAZE_SIZE - 1, const Offset(0, 0)));
     }
     return MaterialApp(
       home: Scaffold(
@@ -54,7 +58,7 @@ class _MyAppState extends State<MyApp> {
           children: [
             Expanded(
               flex: 3,
-              // 32x32のマス目状の盤面
+              // マス目状の盤面
               child: FieldWidget(
                 arrowsAll: arrowsAll,
                 selectedIndex: selectedIndex,
@@ -238,9 +242,8 @@ class _MyAppState extends State<MyApp> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        arrowsAll[0].clear();
-                        arrowsAll[1].clear();
-                        arrowsAll[2].clear();
+                        for (int i = 0; i < MOUSE_NUM; i++)
+                          arrowsAll[i].clear();
                       });
                     },
                     child: const Text('リセット'),
@@ -285,18 +288,16 @@ class _MyAppState extends State<MyApp> {
   }
 
   void sendArrows() async {
-    final ip = '192.168.251.3'; // PCのIPアドレス
-    final port = 1250; // PCのポート
     try {
       final socket =
-          await Socket.connect(ip, port, timeout: Duration(seconds: 5));
+          await Socket.connect(ip, port, timeout: const Duration(seconds: 5));
       // 各マウスの経路を送信
       List<Map<String, dynamic>> paths = [];
-      for (int i = 0; i < mouceNum; i++) {
+      for (int i = 0; i < MOUSE_NUM; i++) {
         List<int> path = [];
         for (Arrow arrow in arrowsAll[i]) {
           path.add(arrow.x);
-          path.add(arrow.y);
+          path.add(MAZE_SIZE - arrow.y - 1);
         }
         paths.add({
           'mouse_id': i,
@@ -318,8 +319,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void sendMsg(String msg) async {
-    final ip = '192.168.251.3'; // PCのIPアドレス
-    final port = 1250; // PCのポート
     try {
       final socket =
           await Socket.connect(ip, port, timeout: Duration(seconds: 5));
