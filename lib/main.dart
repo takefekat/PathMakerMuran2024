@@ -25,17 +25,17 @@ class _MyAppState extends State<MyApp> {
     var orientation = MediaQuery.of(context).orientation;
     // 初期位置を設定
     if (arrowsAll[0].isEmpty) {
-      arrowsAll[0].add(Arrow(0, 0, const Offset(0, 0)));
+      arrowsAll[0].add(Arrow(0, 0, DIR_RGT));
       // arrowsAll[0].add(Arrow(1, 1, const Offset(0, 0))); // 32x32の場合
     }
     if (arrowsAll[1].isEmpty) {
-      arrowsAll[1].add(Arrow(0, MAZE_SIZE - 1, const Offset(0, 0)));
+      arrowsAll[1].add(Arrow(0, MAZE_SIZE - 1, DIR_UP));
     }
     if (arrowsAll[2].isEmpty) {
-      arrowsAll[2].add(Arrow(MAZE_SIZE - 1, 0, const Offset(0, 0)));
+      arrowsAll[2].add(Arrow(MAZE_SIZE - 1, 0, DIR_DWN));
     }
     if (arrowsAll[3].isEmpty) {
-      arrowsAll[3].add(Arrow(MAZE_SIZE - 1, MAZE_SIZE - 1, const Offset(0, 0)));
+      arrowsAll[3].add(Arrow(MAZE_SIZE - 1, MAZE_SIZE - 1, DIR_LFT));
     }
     return MaterialApp(
       home: Scaffold(
@@ -62,6 +62,7 @@ class _MyAppState extends State<MyApp> {
               child: FieldWidget(
                 arrowsAll: arrowsAll,
                 selectedIndex: selectedIndex,
+                moucePathMode: moucePathMode,
                 onSelectedIndexChanged: (index) {
                   setState(() {
                     selectedIndex = index;
@@ -119,9 +120,8 @@ class _MyAppState extends State<MyApp> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        arrowsAll[0].clear();
-                        arrowsAll[1].clear();
-                        arrowsAll[2].clear();
+                        for (int i = 0; i < MOUSE_NUM; i++)
+                          arrowsAll[i].clear();
                       });
                     },
                     child: const Text('リセット'),
@@ -225,6 +225,7 @@ class _MyAppState extends State<MyApp> {
               child: FieldWidget(
                 arrowsAll: arrowsAll,
                 selectedIndex: selectedIndex,
+                moucePathMode: moucePathMode,
                 onSelectedIndexChanged: (index) {
                   setState(() {
                     selectedIndex = index;

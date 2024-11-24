@@ -16,7 +16,7 @@ class CustomDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 150, // 適切な幅を指定
+      width: 200, // 適切な幅を指定
       decoration: BoxDecoration(
         color: mouceColors[mouceIndex], // 背景色を赤色に設定
         borderRadius: BorderRadius.circular(30.0), // 楕円形にするための角の丸みを設定
@@ -32,22 +32,22 @@ class CustomDropdown extends StatelessWidget {
       child: DropdownButton(
         items: const [
           DropdownMenuItem<int>(
-            value: MOUSE_PATH_MODE_MANUAL,
+            value: PATH_MODE_MANUAL,
             child: Center(
                 child: Text('手動', style: TextStyle(fontSize: FONT_SIZE))),
           ),
           DropdownMenuItem<int>(
-            value: MOUSE_PATH_MODE_AUTO,
+            value: PATH_MODE_AUTO,
             child: Center(
-                child: Text('自動', style: TextStyle(fontSize: FONT_SIZE))),
+                child: Text('まっすぐ', style: TextStyle(fontSize: FONT_SIZE))),
           ),
           DropdownMenuItem<int>(
-            value: MOUSE_PATH_MODE_RANDOM,
+            value: PATH_MODE_RANDOM,
             child: Center(
                 child: Text('ランダム', style: TextStyle(fontSize: FONT_SIZE))),
           ),
           DropdownMenuItem<int>(
-            value: MOUSE_PATH_MODE_OFF,
+            value: PATH_MODE_OFF,
             child: Center(
                 child: Text('OFF', style: TextStyle(fontSize: FONT_SIZE))),
           ),

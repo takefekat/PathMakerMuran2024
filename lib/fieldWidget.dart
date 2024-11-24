@@ -5,6 +5,7 @@ import 'common.dart';
 class FieldWidget extends StatelessWidget {
   final List<List<Arrow>> arrowsAll;
   final int selectedIndex;
+  final List<int> moucePathMode;
   final Function(int) onSelectedIndexChanged;
 
   double simTime = 0;
@@ -12,6 +13,7 @@ class FieldWidget extends StatelessWidget {
   FieldWidget({
     required this.arrowsAll,
     required this.selectedIndex,
+    required this.moucePathMode,
     required this.onSelectedIndexChanged,
   });
 
@@ -72,8 +74,103 @@ class FieldWidget extends StatelessWidget {
                         Arrow lastArrow = arrowsAll[selectedIndex].last;
                         if ((x - lastArrow.x).abs() + (y - lastArrow.y).abs() ==
                             1) {
-                          arrowsAll[selectedIndex]
-                              .add(Arrow(x, y, details.delta));
+                          // 手動モードで1経路追加
+                          arrowsAll[selectedIndex].add(
+                              Arrow(x, y, calcDir(lastArrow, Arrow(x, y, 0))));
+                          // 手動モードで経路追加時に自動モードも1経路追加する
+                          for (int mIdx = 0; mIdx < MOUSE_NUM; mIdx++) {
+                            if (moucePathMode[mIdx] == PATH_MODE_AUTO) {
+                              // 前回の方向に進めるなら進む
+                              // 進めなければ右回転、左回転の順で進む
+                              for (int i = 0; i < DIR_NUM; i++) {
+                                int lastDir = arrowsAll[mIdx].last.lastdir;
+                                int nextDir = (lastDir + i) % DIR_NUM;
+                                int nextX =
+                                    arrowsAll[mIdx].last.x + dxs[nextDir];
+                                int nextY =
+                                    arrowsAll[mIdx].last.y + dys[nextDir];
+
+                                // 進める方向の場合は無視
+                                if (nextX < 0 ||
+                                    nextX >= MAZE_SIZE ||
+                                    nextY < 0 ||
+                                    nextY >= MAZE_SIZE) {
+                                  continue;
+                                }
+                                // いずれかのマウスの経路と重複している場合は無視
+                                bool isOverlap = false;
+                                for (int i = 0; i < MOUSE_NUM; i++) {
+                                  for (int j = 0;
+                                      j < arrowsAll[i].length;
+                                      j++) {
+                                    if (arrowsAll[i][j].x == nextX &&
+                                        arrowsAll[i][j].y == nextY) {
+                                      isOverlap = true;
+                                      break;
+                                    }
+                                  }
+                                }
+                                if (isOverlap) {
+                                  continue;
+                                }
+                                arrowsAll[mIdx]
+                                    .add(Arrow(nextX, nextY, nextDir));
+                                break;
+                              }
+                            }
+                            if (moucePathMode[mIdx] == PATH_MODE_RANDOM) {
+                              // 上下左右のどれかにランダムに進む
+                              // 進める方向をリストをシャッフルしてランダムに選択
+                              List<int> directions = [
+                                DIR_RGT,
+                                DIR_DWN,
+                                DIR_LFT,
+                                DIR_UP
+                              ];
+                              directions.shuffle();
+                              for (int nextDir in directions) {
+                                int dx = 0;
+                                int dy = 0;
+                                if (nextDir == DIR_RGT) {
+                                  dx = 1;
+                                } else if (nextDir == DIR_UP) {
+                                  dy = 1;
+                                } else if (nextDir == DIR_LFT) {
+                                  dx = -1;
+                                } else if (nextDir == DIR_DWN) {
+                                  dy = -1;
+                                }
+                                int nextX = arrowsAll[mIdx].last.x + dx;
+                                int nextY = arrowsAll[mIdx].last.y + dy;
+                                // 進める方向の場合は無視
+                                if (nextX < 0 ||
+                                    nextX >= MAZE_SIZE ||
+                                    nextY < 0 ||
+                                    nextY >= MAZE_SIZE) {
+                                  continue;
+                                }
+                                // いずれかのマウスの経路と重複している場合は無視
+                                bool isOverlap = false;
+                                for (int i = 0; i < MOUSE_NUM; i++) {
+                                  for (int j = 0;
+                                      j < arrowsAll[i].length;
+                                      j++) {
+                                    if (arrowsAll[i][j].x == nextX &&
+                                        arrowsAll[i][j].y == nextY) {
+                                      isOverlap = true;
+                                      break;
+                                    }
+                                  }
+                                }
+                                if (isOverlap) {
+                                  continue;
+                                }
+                                arrowsAll[mIdx]
+                                    .add(Arrow(nextX, nextY, nextDir));
+                                break;
+                              }
+                            }
+                          }
                         }
                       }
                     },
@@ -95,20 +192,6 @@ class FieldWidget extends StatelessWidget {
       ),
     );
   }
-}
-
-class Arrow {
-  final int x;
-  final int y;
-  final Offset direction;
-
-  Arrow(this.x, this.y, this.direction);
-  Map<String, dynamic> toJson() => {
-        'x': x,
-        'y': y,
-        'dx': direction.dx,
-        'dy': direction.dy,
-      };
 }
 
 class Point {
