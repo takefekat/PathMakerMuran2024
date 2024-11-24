@@ -85,13 +85,6 @@ class FieldWidget extends StatelessWidget {
               ),
             ),
           ),
-          // シミュレーションシークバー
-          ChangeForm(
-            simTime: simTime,
-            onSimTimeChanged: (e) {
-              simTime = e;
-            },
-          ),
         ],
       ),
     );
@@ -260,48 +253,5 @@ class GridPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
-  }
-}
-
-class ChangeForm extends StatefulWidget {
-  final double simTime;
-  final ValueChanged<double> onSimTimeChanged;
-
-  ChangeForm({required this.simTime, required this.onSimTimeChanged});
-
-  @override
-  _ChangeFormState createState() => _ChangeFormState();
-}
-
-class _ChangeFormState extends State<ChangeForm> {
-  double _value = 0.0;
-
-  @override
-  void initState() {
-    super.initState();
-    _value = widget.simTime;
-  }
-
-  void _changeSlider(double e) {
-    setState(() {
-      _value = e;
-    });
-    widget.onSimTimeChanged(e);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Slider(
-        label: '${_value.toStringAsFixed(1)}', // 小数点以下1桁まで表示
-        min: 0,
-        max: 60, // 60sまで
-        value: _value,
-        activeColor: const Color.fromARGB(255, 220, 0, 50),
-        inactiveColor: Colors.grey,
-        divisions: 60 * 10, // 0.1sごとに分割
-        onChanged: _changeSlider,
-      ),
-    );
   }
 }
