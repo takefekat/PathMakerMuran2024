@@ -72,18 +72,39 @@ void sendMsg(String msg) async {
       socket.write(body);
       await socket.flush();
 
-      // サーバーからの応答を受信
-      //final response = await socket
-      //    .transform(utf8.decoder.cast<Uint8List, String>())
-      //    .join();
-      //final jsonResponse = json.decode(response);
-      //print('Response from server: $jsonResponse');
       socket.close();
-      print('Data sent successfully');
+      // print('Data sent successfully');
     } catch (e) {
       print('Error while sending data: $e');
     }
   } catch (e) {
     print('Error connecting to server: $e');
+  }
+}
+
+Future<String> sendRecvMsg(String msg) async {
+  try {
+    final socket =
+        await Socket.connect(ip, port, timeout: Duration(seconds: 5));
+
+    final body = json.encode({'signal': msg});
+    try {
+      socket.write(body);
+      await socket.flush();
+
+      // サーバーからの応答を受信
+      final response =
+          await socket.transform(utf8.decoder.cast<Uint8List, String>()).join();
+      print(response);
+
+      socket.close();
+      return response;
+    } catch (e) {
+      print('Error while sending data: $e');
+      return "";
+    }
+  } catch (e) {
+    print('Error connecting to server: $e');
+    return "";
   }
 }

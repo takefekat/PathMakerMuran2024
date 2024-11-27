@@ -6,6 +6,7 @@ class FieldWidget extends StatelessWidget {
   final List<List<Arrow>> arrowsAll;
   final int selectedIndex;
   final List<int> moucePathMode;
+  final List<Arrow> objs;
   final Function(int) onSelectedIndexChanged;
 
   double simTime = 0;
@@ -14,13 +15,14 @@ class FieldWidget extends StatelessWidget {
     required this.arrowsAll,
     required this.selectedIndex,
     required this.moucePathMode,
+    required this.objs,
     required this.onSelectedIndexChanged,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(24.0), // 余白を追加
+      padding: const EdgeInsets.all(32.0), // 余白を追加
       child: Column(
         children: [
           Expanded(
@@ -184,6 +186,7 @@ class FieldWidget extends StatelessWidget {
                       painter: GridPainter(
                         cellSize: cellSize,
                         arrowsAll: arrowsAll,
+                        objs: objs,
                         selectedIndex: selectedIndex,
                         simTime: simTime,
                       ),
@@ -220,12 +223,14 @@ class Point {
 class GridPainter extends CustomPainter {
   final double cellSize;
   final List<List<Arrow>> arrowsAll;
+  final List<Arrow> objs;
   final int selectedIndex;
   final double simTime;
 
   GridPainter(
       {required this.cellSize,
       required this.arrowsAll,
+      required this.objs,
       required this.selectedIndex,
       required this.simTime});
 
@@ -261,6 +266,15 @@ class GridPainter extends CustomPainter {
       canvas.drawRect(
           Rect.fromLTWH(size.width - cellSize, 0, cellSize, size.height),
           fillPaint);
+    }
+    // 障害物を描画
+    for (Arrow obj in objs) {
+      final objPaint = Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.fill;
+      canvas.drawRect(
+          Rect.fromLTWH(obj.x * cellSize, obj.y * cellSize, cellSize, cellSize),
+          objPaint);
     }
     // 矢印を描画
     for (int i = 0; i < arrowsAll.length; i++) {

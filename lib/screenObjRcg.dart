@@ -64,19 +64,29 @@ class ObjectRecognition extends StatelessWidget {
                         onTap: () async {
                           sendMsg("mode:pathFind");
                           print("mode:pathFind");
+                          List<Arrow> objs = [];
 
-                        Navigator.push(
-                          context,
+                          final response = await sendRecvMsg("get_path");
+                          if (response != "") {
+                            final jsonResponse = json.decode(response);
+
+                            jsonResponse['objs'].forEach((obj) {
+                              objs.add(Arrow(obj['x'], obj['y'], 0));
+                            });
+                          }
+
+                          Navigator.push(
+                            context,
                             MaterialPageRoute(
                                 builder: (context) => PathFind(objs: objs)),
                           ).then((value) {
                             print("mode:objRecg");
                             sendMsg("mode:objRecg");
                           });
-                      },
-                      child: Image.asset('images/NextButton.png'),
+                        },
+                        child: Image.asset('images/NextButton.png'),
+                      ),
                     ),
-                  ),
                   ),
                 ],
               ),

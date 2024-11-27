@@ -12,14 +12,22 @@ import 'screenObjRcg.dart';
 import 'screenCleaner.dart';
 
 class PathFind extends StatefulWidget {
+  final List<Arrow> objs;
+
+  PathFind({required this.objs});
+
   @override
-  _PathFind createState() => _PathFind();
+  _PathFind createState() => _PathFind(objs);
 }
 
 class _PathFind extends State<PathFind> {
   List<List<Arrow>> arrowsAll = List.generate(MOUSE_NUM, (_) => []);
   List<int> moucePathMode = List.generate(MOUSE_NUM, (_) => 0);
   int selectedIndex = 0;
+  final List<Arrow> objs;
+
+  @override
+  _PathFind(this.objs);
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +72,7 @@ class _PathFind extends State<PathFind> {
                 arrowsAll: arrowsAll,
                 selectedIndex: selectedIndex,
                 moucePathMode: moucePathMode,
+                objs: objs,
                 onSelectedIndexChanged: (index) {
                   setState(() {
                     selectedIndex = index;
@@ -77,8 +86,9 @@ class _PathFind extends State<PathFind> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const SizedBox(height: 32), // ボタン間のスペース
                   Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: CustomDropdown(
                       selectedValue: moucePathMode[0],
                       mouceIndex: 0,
@@ -91,7 +101,7 @@ class _PathFind extends State<PathFind> {
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
                   Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: CustomDropdown(
                       selectedValue: moucePathMode[1],
                       mouceIndex: 1,
@@ -104,7 +114,7 @@ class _PathFind extends State<PathFind> {
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
                   Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: CustomDropdown(
                       selectedValue: moucePathMode[2],
                       mouceIndex: 2,
@@ -117,7 +127,7 @@ class _PathFind extends State<PathFind> {
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
                   Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: CustomDropdown(
                       selectedValue: moucePathMode[3],
                       mouceIndex: 3,
@@ -147,20 +157,20 @@ class _PathFind extends State<PathFind> {
                     flex: 1,
                     child: Center(
                       child: InkWell(
-                      onTap: () {
+                        onTap: () {
                           sendArrows();
                           print("mode:clearner");
                           sendMsg("mode:clearner");
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CleanerScreen()),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CleanerScreen()),
                           ).then((value) {
                             print("mode:pathFind");
                             sendMsg("mode:pathFind");
                           });
-                      },
-                      child: Image.asset('images/NextButton.png'),
+                        },
+                        child: Image.asset('images/NextButton.png'),
                       ),
                     ),
                   ),
@@ -235,6 +245,7 @@ class _PathFind extends State<PathFind> {
                 arrowsAll: arrowsAll,
                 selectedIndex: selectedIndex,
                 moucePathMode: moucePathMode,
+                objs: objs,
                 onSelectedIndexChanged: (index) {
                   setState(() {
                     selectedIndex = index;
@@ -308,7 +319,7 @@ class _PathFind extends State<PathFind> {
         socket.write(body);
         await socket.flush();
         socket.close();
-        print('Data sent successfully');
+        print('Path sent successfully');
       } catch (e) {
         print('Error while sending data: $e');
       }
