@@ -145,15 +145,23 @@ class _PathFind extends State<PathFind> {
                   const SizedBox(height: 32), // ボタン間のスペース
                   Expanded(
                     flex: 1,
-                    child: GestureDetector(
+                    child: Center(
+                      child: InkWell(
                       onTap: () {
+                          sendArrows();
+                          print("mode:clearner");
+                          sendMsg("mode:clearner");
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => CleanerScreen()),
-                        );
+                          ).then((value) {
+                            print("mode:pathFind");
+                            sendMsg("mode:pathFind");
+                          });
                       },
                       child: Image.asset('images/NextButton.png'),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
@@ -255,11 +263,16 @@ class _PathFind extends State<PathFind> {
                     flex: 2,
                     child: GestureDetector(
                       onTap: () {
+                        print("mode:clearner");
+                        sendMsg("mode:clearner");
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => CleanerScreen()),
-                        );
+                        ).then((value) {
+                          print("mode:pathFind");
+                          sendMsg("mode:pathFind");
+                        });
                       },
                       child: Image.asset('images/NextButton.png'),
                     ),

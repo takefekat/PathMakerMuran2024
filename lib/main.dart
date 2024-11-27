@@ -54,10 +54,15 @@ class _HomeScreen extends State<HomeScreen> {
     return Scaffold(
       body: GestureDetector(
         onTap: () {
+          print("mode:objRcg");
+          sendMsg("mode:objRcg");
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ObjectRecognition()),
-          );
+          ).then((value) {
+            print("mode:home");
+            sendMsg("mode:home");
+          });
         },
         child: Center(
           child: _controller.value.isInitialized

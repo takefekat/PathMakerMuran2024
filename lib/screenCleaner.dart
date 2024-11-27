@@ -86,14 +86,22 @@ class CleanerScreen extends StatelessWidget {
                   */
                   Expanded(
                     flex: 2,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
-                        );
-                      },
-                      child: Image.asset('images/FinishButton.png'),
+                    child: Center(
+                      child: InkWell(
+                        onTap: () {
+                          print("mode:home");
+                          sendMsg("mode:home");
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HomeScreen()),
+                          ).then((value) {
+                            print("mode:cleaner");
+                            sendMsg("mode:cleaner");
+                          });
+                        },
+                        child: Image.asset('images/FinishButton.png'),
+                      ),
                     ),
                   ),
                 ],

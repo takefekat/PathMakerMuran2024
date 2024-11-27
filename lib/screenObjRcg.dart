@@ -59,15 +59,24 @@ class ObjectRecognition extends StatelessWidget {
                   //),
                   Expanded(
                     flex: 2,
-                    child: GestureDetector(
-                      onTap: () {
+                    child: Center(
+                      child: InkWell(
+                        onTap: () async {
+                          sendMsg("mode:pathFind");
+                          print("mode:pathFind");
+
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => PathFind()),
-                        );
+                            MaterialPageRoute(
+                                builder: (context) => PathFind(objs: objs)),
+                          ).then((value) {
+                            print("mode:objRecg");
+                            sendMsg("mode:objRecg");
+                          });
                       },
                       child: Image.asset('images/NextButton.png'),
                     ),
+                  ),
                   ),
                 ],
               ),
