@@ -95,6 +95,12 @@ class _PathFind extends State<PathFind> {
                       onChanged: (int? value) {
                         setState(() {
                           moucePathMode[0] = value!;
+                          if (value == PATH_MODE_OFF) {
+                            arrowsAll[0].clear();
+                          } else {
+                            arrowsAll[0].clear();
+                            arrowsAll[0].add(Arrow(0, 0, 0));
+                          }
                         });
                       },
                     ),
@@ -108,6 +114,12 @@ class _PathFind extends State<PathFind> {
                       onChanged: (int? value) {
                         setState(() {
                           moucePathMode[1] = value!;
+                          if (value == PATH_MODE_OFF) {
+                            arrowsAll[1].clear();
+                          } else {
+                            arrowsAll[1].clear();
+                            arrowsAll[1].add(Arrow(0, MAZE_SIZE - 1, DIR_UP));
+                          }
                         });
                       },
                     ),
@@ -121,6 +133,12 @@ class _PathFind extends State<PathFind> {
                       onChanged: (int? value) {
                         setState(() {
                           moucePathMode[2] = value!;
+                          if (value == PATH_MODE_OFF) {
+                            arrowsAll[2].clear();
+                          } else {
+                            arrowsAll[2].clear();
+                            arrowsAll[2].add(Arrow(MAZE_SIZE - 1, 0, DIR_DWN));
+                          }
                         });
                       },
                     ),
@@ -134,6 +152,13 @@ class _PathFind extends State<PathFind> {
                       onChanged: (int? value) {
                         setState(() {
                           moucePathMode[3] = value!;
+                          if (value == PATH_MODE_OFF) {
+                            arrowsAll[3].clear();
+                          } else {
+                            arrowsAll[3].clear();
+                            arrowsAll[3].add(
+                                Arrow(MAZE_SIZE - 1, MAZE_SIZE - 1, DIR_LFT));
+                          }
                         });
                       },
                     ),
