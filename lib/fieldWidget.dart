@@ -35,163 +35,7 @@ class FieldWidget extends StatelessWidget {
                   double cellSize = gridSize / MAZE_SIZE.toDouble();
                   return GestureDetector(
                     onPanUpdate: (details) {
-                      int selectedIndex_ = selectedIndex;
-                      // タッチされたマス目を特定
-                      Offset position = details.localPosition;
-                      int x = (position.dx / cellSize).floor();
-                      int y = (position.dy / cellSize).floor();
-
-                      // 障害物の場合は何もしない
-                      for (Arrow obj in objs) {
-                        if (obj.x == x && obj.y == y) {
-                          return;
-                        }
-                      }
-                      // if ((x > 0 && x < 31 && y > 0 && y < 31)) { // 32サイズの場合は外周には描画しない
-                      if ((x >= 0 &&
-                          x < MAZE_SIZE &&
-                          y >= 0 &&
-                          y < MAZE_SIZE)) {
-                        // 一度通過済みのセルの場合はそれ以降の経路をリセット
-                        for (int i = 0; i < MOUSE_NUM; i++) {
-                          for (int j = 0; j < arrowsAll[i].length - 1; j++) {
-                            if (arrowsAll[i][j].x == x &&
-                                arrowsAll[i][j].y == y) {
-                              arrowsAll[i]
-                                  .removeRange(j + 1, arrowsAll[i].length);
-                              break;
-                            }
-                          }
-                        }
-
-                        for (int i = 0; i < MOUSE_NUM; i++) {
-                          if (arrowsAll[i].isNotEmpty &&
-                              arrowsAll[i].last.x == x &&
-                              arrowsAll[i].last.y == y) {
-                            onSelectedIndexChanged(i);
-                            selectedIndex_ = i;
-                            break;
-                          }
-                        }
-
-                        // 経路末尾と隣接するセルにのみ移動可能
-                        Arrow lastArrow = arrowsAll[selectedIndex_].last;
-                        if ((x - lastArrow.x).abs() + (y - lastArrow.y).abs() ==
-                            1) {
-                          // 手動モードで1経路追加
-                          arrowsAll[selectedIndex_].add(
-                              Arrow(x, y, calcDir(lastArrow, Arrow(x, y, 0))));
-
-                          // 手動モードで経路追加時に自動モードも1経路追加する
-                          for (int mIdx = 0; mIdx < MOUSE_NUM; mIdx++) {
-                            if (moucePathMode[mIdx] == PATH_MODE_AUTO) {
-                              // 前回の方向に進めるなら進む
-                              // 進めなければ右回転、左回転の順で進む
-                              for (int i = 0; i < DIR_NUM; i++) {
-                                int lastDir = arrowsAll[mIdx].last.lastdir;
-                                int nextDir = (lastDir + i) % DIR_NUM;
-                                int nextX =
-                                    arrowsAll[mIdx].last.x + dxs[nextDir];
-                                int nextY =
-                                    arrowsAll[mIdx].last.y + dys[nextDir];
-
-                                // 進めない方向の場合は無視
-                                if (nextX < 0 ||
-                                    nextX >= MAZE_SIZE ||
-                                    nextY < 0 ||
-                                    nextY >= MAZE_SIZE) {
-                                  continue;
-                                }
-                                // いずれかのマウスの経路と重複している場合は無視
-                                bool isOverlap = false;
-                                for (int i = 0; i < MOUSE_NUM; i++) {
-                                  for (int j = 0;
-                                      j < arrowsAll[i].length;
-                                      j++) {
-                                    if (arrowsAll[i][j].x == nextX &&
-                                        arrowsAll[i][j].y == nextY) {
-                                      isOverlap = true;
-                                      break;
-                                    }
-                                  }
-                                }
-                                // 障害物の場合は無視
-                                for (Arrow obj in objs) {
-                                  if (obj.x == nextX && obj.y == nextY) {
-                                    isOverlap = true;
-                                    break;
-                                  }
-                                }
-                                if (isOverlap) {
-                                  continue;
-                                }
-                                arrowsAll[mIdx]
-                                    .add(Arrow(nextX, nextY, nextDir));
-                                break;
-                              }
-                            }
-                            if (moucePathMode[mIdx] == PATH_MODE_RANDOM) {
-                              // 上下左右のどれかにランダムに進む
-                              // 進める方向をリストをシャッフルしてランダムに選択
-                              List<int> directions = [
-                                DIR_RGT,
-                                DIR_DWN,
-                                DIR_LFT,
-                                DIR_UP
-                              ];
-                              directions.shuffle();
-                              for (int nextDir in directions) {
-                                int dx = 0;
-                                int dy = 0;
-                                if (nextDir == DIR_RGT) {
-                                  dx = 1;
-                                } else if (nextDir == DIR_UP) {
-                                  dy = 1;
-                                } else if (nextDir == DIR_LFT) {
-                                  dx = -1;
-                                } else if (nextDir == DIR_DWN) {
-                                  dy = -1;
-                                }
-                                int nextX = arrowsAll[mIdx].last.x + dx;
-                                int nextY = arrowsAll[mIdx].last.y + dy;
-                                // 進める方向の場合は無視
-                                if (nextX < 0 ||
-                                    nextX >= MAZE_SIZE ||
-                                    nextY < 0 ||
-                                    nextY >= MAZE_SIZE) {
-                                  continue;
-                                }
-                                // いずれかのマウスの経路と重複している場合は無視
-                                bool isOverlap = false;
-                                for (int i = 0; i < MOUSE_NUM; i++) {
-                                  for (int j = 0;
-                                      j < arrowsAll[i].length;
-                                      j++) {
-                                    if (arrowsAll[i][j].x == nextX &&
-                                        arrowsAll[i][j].y == nextY) {
-                                      isOverlap = true;
-                                      break;
-                                    }
-                                  }
-                                }
-                                // 障害物の場合は無視
-                                for (Arrow obj in objs) {
-                                  if (obj.x == nextX && obj.y == nextY) {
-                                    isOverlap = true;
-                                    break;
-                                  }
-                                }
-                                if (isOverlap) {
-                                  continue;
-                                }
-                                arrowsAll[mIdx]
-                                    .add(Arrow(nextX, nextY, nextDir));
-                                break;
-                              }
-                            }
-                          }
-                        }
-                      }
+                      updateMap(details, cellSize);
                     },
                     child: CustomPaint(
                       size: Size(gridSize, gridSize),
@@ -211,6 +55,147 @@ class FieldWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void updateMap(details, cellSize) {
+    int selectedIndex_ = selectedIndex;
+    // タッチされたマス目を特定
+    Offset position = details.localPosition;
+    int x = (position.dx / cellSize).floor();
+    int y = (position.dy / cellSize).floor();
+
+    // 障害物の場合は何もしない
+    for (Arrow obj in objs) {
+      if (obj.x == x && obj.y == y) {
+        return;
+      }
+    }
+    // if ((x > 0 && x < 31 && y > 0 && y < 31)) { // 32サイズの場合は外周には描画しない
+    if ((x >= 0 && x < MAZE_SIZE && y >= 0 && y < MAZE_SIZE)) {
+      // 一度通過済みのセルの場合はそれ以降の経路をリセット
+      for (int i = 0; i < MOUSE_NUM; i++) {
+        for (int j = 0; j < arrowsAll[i].length - 1; j++) {
+          if (arrowsAll[i][j].x == x && arrowsAll[i][j].y == y) {
+            arrowsAll[i].removeRange(j + 1, arrowsAll[i].length);
+            break;
+          }
+        }
+      }
+
+      for (int i = 0; i < MOUSE_NUM; i++) {
+        if (arrowsAll[i].isNotEmpty &&
+            arrowsAll[i].last.x == x &&
+            arrowsAll[i].last.y == y) {
+          onSelectedIndexChanged(i);
+          selectedIndex_ = i;
+          break;
+        }
+      }
+
+      // 経路末尾と隣接するセルにのみ移動可能
+      Arrow lastArrow = arrowsAll[selectedIndex_].last;
+      if ((x - lastArrow.x).abs() + (y - lastArrow.y).abs() == 1) {
+        // 手動モードで1経路追加
+        arrowsAll[selectedIndex_]
+            .add(Arrow(x, y, calcDir(lastArrow, Arrow(x, y, 0))));
+
+        // 手動モードで経路追加時に自動モードも1経路追加する
+        for (int mIdx = 0; mIdx < MOUSE_NUM; mIdx++) {
+          if (moucePathMode[mIdx] == PATH_MODE_AUTO) {
+            // 前回の方向に進めるなら進む
+            // 進めなければ右回転、左回転の順で進む
+            for (int i = 0; i < DIR_NUM; i++) {
+              int lastDir = arrowsAll[mIdx].last.lastdir;
+              int nextDir = (lastDir + i) % DIR_NUM;
+              int nextX = arrowsAll[mIdx].last.x + dxs[nextDir];
+              int nextY = arrowsAll[mIdx].last.y + dys[nextDir];
+
+              // 進めない方向の場合は無視
+              if (nextX < 0 ||
+                  nextX >= MAZE_SIZE ||
+                  nextY < 0 ||
+                  nextY >= MAZE_SIZE) {
+                continue;
+              }
+              // いずれかのマウスの経路と重複している場合は無視
+              bool isOverlap = false;
+              for (int i = 0; i < MOUSE_NUM; i++) {
+                for (int j = 0; j < arrowsAll[i].length; j++) {
+                  if (arrowsAll[i][j].x == nextX &&
+                      arrowsAll[i][j].y == nextY) {
+                    isOverlap = true;
+                    break;
+                  }
+                }
+              }
+              // 障害物の場合は無視
+              for (Arrow obj in objs) {
+                if (obj.x == nextX && obj.y == nextY) {
+                  isOverlap = true;
+                  break;
+                }
+              }
+              if (isOverlap) {
+                continue;
+              }
+              arrowsAll[mIdx].add(Arrow(nextX, nextY, nextDir));
+              break;
+            }
+          }
+          if (moucePathMode[mIdx] == PATH_MODE_RANDOM) {
+            // 上下左右のどれかにランダムに進む
+            // 進める方向をリストをシャッフルしてランダムに選択
+            List<int> directions = [DIR_RGT, DIR_DWN, DIR_LFT, DIR_UP];
+            directions.shuffle();
+            for (int nextDir in directions) {
+              int dx = 0;
+              int dy = 0;
+              if (nextDir == DIR_RGT) {
+                dx = 1;
+              } else if (nextDir == DIR_UP) {
+                dy = 1;
+              } else if (nextDir == DIR_LFT) {
+                dx = -1;
+              } else if (nextDir == DIR_DWN) {
+                dy = -1;
+              }
+              int nextX = arrowsAll[mIdx].last.x + dx;
+              int nextY = arrowsAll[mIdx].last.y + dy;
+              // 進める方向の場合は無視
+              if (nextX < 0 ||
+                  nextX >= MAZE_SIZE ||
+                  nextY < 0 ||
+                  nextY >= MAZE_SIZE) {
+                continue;
+              }
+              // いずれかのマウスの経路と重複している場合は無視
+              bool isOverlap = false;
+              for (int i = 0; i < MOUSE_NUM; i++) {
+                for (int j = 0; j < arrowsAll[i].length; j++) {
+                  if (arrowsAll[i][j].x == nextX &&
+                      arrowsAll[i][j].y == nextY) {
+                    isOverlap = true;
+                    break;
+                  }
+                }
+              }
+              // 障害物の場合は無視
+              for (Arrow obj in objs) {
+                if (obj.x == nextX && obj.y == nextY) {
+                  isOverlap = true;
+                  break;
+                }
+              }
+              if (isOverlap) {
+                continue;
+              }
+              arrowsAll[mIdx].add(Arrow(nextX, nextY, nextDir));
+              break;
+            }
+          }
+        }
+      }
+    }
   }
 }
 
