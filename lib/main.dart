@@ -26,10 +26,10 @@ class MyApp extends StatelessWidget {
 
 class HomeScreen extends StatefulWidget {
   @override
-  _VideoScreenState createState() => _VideoScreenState();
+  _HomeScreen createState() => _HomeScreen();
 }
 
-class _VideoScreenState extends State<HomeScreen> {
+class _HomeScreen extends State<HomeScreen> {
   late VideoPlayerController _controller;
 
   @override
