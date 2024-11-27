@@ -44,14 +44,19 @@ class FieldWidget extends StatelessWidget {
                           y >= 0 &&
                           y < MAZE_SIZE)) {
                         // 一度通過済みのセルの場合はそれ以降の経路をリセット
-                        for (int i = 0; i < arrowsAll.length; i++) {
+                        for (int i = 0; i < MOUSE_NUM; i++) {
+                          bool isRemove = false;
                           for (int j = 0; j < arrowsAll[i].length; j++) {
                             if (arrowsAll[i][j].x == x &&
                                 arrowsAll[i][j].y == y) {
                               arrowsAll[i]
                                   .removeRange(j + 1, arrowsAll[i].length);
+                              isRemove = true;
                               break;
                             }
+                          }
+                          if (isRemove) {
+                            break;
                           }
                         }
 

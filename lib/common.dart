@@ -1,4 +1,14 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'fieldWidget.dart';
+import 'dropDownButton.dart';
+import 'common.dart';
+import 'dart:async'; // Timerクラスを使用するために必要
+import 'dart:convert';
+import 'dart:typed_data';
+import 'screenObjRcg.dart';
 
 const int MOUSE_NUM = 4;
 const List<Color> mouceColors = [
@@ -49,5 +59,31 @@ int calcDir(Arrow a1, Arrow a2) {
     } else {
       return DIR_LFT;
     }
+  }
+}
+
+void sendMsg(String msg) async {
+  try {
+    final socket =
+        await Socket.connect(ip, port, timeout: Duration(seconds: 5));
+
+    final body = json.encode({'signal': msg});
+    try {
+      socket.write(body);
+      await socket.flush();
+
+      // サーバーからの応答を受信
+      //final response = await socket
+      //    .transform(utf8.decoder.cast<Uint8List, String>())
+      //    .join();
+      //final jsonResponse = json.decode(response);
+      //print('Response from server: $jsonResponse');
+      socket.close();
+      print('Data sent successfully');
+    } catch (e) {
+      print('Error while sending data: $e');
+    }
+  } catch (e) {
+    print('Error connecting to server: $e');
   }
 }
