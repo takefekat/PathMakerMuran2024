@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'common.dart';
 
-const double FONT_SIZE = 40;
+const double FONT_SIZE = 32;
 
 class CustomDropdown extends StatelessWidget {
   final int selectedValue;
@@ -21,7 +21,7 @@ class CustomDropdown extends StatelessWidget {
         color: mouceColors[mouceIndex], // 背景色を赤色に設定
         borderRadius: BorderRadius.circular(30.0), // 楕円形にするための角の丸みを設定
         border: Border.all(color: Colors.white, width: 2.0), // 外枠を白色に設定
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black26, // 影の色
             offset: Offset(0, 4), // 影の位置
