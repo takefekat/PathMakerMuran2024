@@ -41,6 +41,12 @@ class FieldWidget extends StatelessWidget {
                       int x = (position.dx / cellSize).floor();
                       int y = (position.dy / cellSize).floor();
 
+                      // 障害物の場合は何もしない
+                      for (Arrow obj in objs) {
+                        if (obj.x == x && obj.y == y) {
+                          return;
+                        }
+                      }
                       // if ((x > 0 && x < 31 && y > 0 && y < 31)) { // 32サイズの場合は外周には描画しない
                       if ((x >= 0 &&
                           x < MAZE_SIZE &&
@@ -89,7 +95,7 @@ class FieldWidget extends StatelessWidget {
                                 int nextY =
                                     arrowsAll[mIdx].last.y + dys[nextDir];
 
-                                // 進める方向の場合は無視
+                                // 進めない方向の場合は無視
                                 if (nextX < 0 ||
                                     nextX >= MAZE_SIZE ||
                                     nextY < 0 ||
@@ -107,6 +113,13 @@ class FieldWidget extends StatelessWidget {
                                       isOverlap = true;
                                       break;
                                     }
+                                  }
+                                }
+                                // 障害物の場合は無視
+                                for (Arrow obj in objs) {
+                                  if (obj.x == nextX && obj.y == nextY) {
+                                    isOverlap = true;
+                                    break;
                                   }
                                 }
                                 if (isOverlap) {
@@ -159,6 +172,13 @@ class FieldWidget extends StatelessWidget {
                                       isOverlap = true;
                                       break;
                                     }
+                                  }
+                                }
+                                // 障害物の場合は無視
+                                for (Arrow obj in objs) {
+                                  if (obj.x == nextX && obj.y == nextY) {
+                                    isOverlap = true;
+                                    break;
                                   }
                                 }
                                 if (isOverlap) {
