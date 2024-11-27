@@ -35,6 +35,7 @@ class FieldWidget extends StatelessWidget {
                   double cellSize = gridSize / MAZE_SIZE.toDouble();
                   return GestureDetector(
                     onPanUpdate: (details) {
+                      int selectedIndex_ = selectedIndex;
                       // タッチされたマス目を特定
                       Offset position = details.localPosition;
                       int x = (position.dx / cellSize).floor();
@@ -47,43 +48,34 @@ class FieldWidget extends StatelessWidget {
                           y < MAZE_SIZE)) {
                         // 一度通過済みのセルの場合はそれ以降の経路をリセット
                         for (int i = 0; i < MOUSE_NUM; i++) {
-                          bool isRemove = false;
-                          for (int j = 0; j < arrowsAll[i].length; j++) {
+                          for (int j = 0; j < arrowsAll[i].length - 1; j++) {
                             if (arrowsAll[i][j].x == x &&
                                 arrowsAll[i][j].y == y) {
                               arrowsAll[i]
                                   .removeRange(j + 1, arrowsAll[i].length);
-                              isRemove = true;
                               break;
                             }
                           }
-                          if (isRemove) {
+                        }
+
+                        for (int i = 0; i < MOUSE_NUM; i++) {
+                          if (arrowsAll[i].isNotEmpty &&
+                              arrowsAll[i].last.x == x &&
+                              arrowsAll[i].last.y == y) {
+                            onSelectedIndexChanged(i);
+                            selectedIndex_ = i;
                             break;
                           }
                         }
 
-                        // selectedIndexを特定
-                        if (arrowsAll[0].last.x == x &&
-                            arrowsAll[0].last.y == y) {
-                          onSelectedIndexChanged(0);
-                        } else if (arrowsAll[1].last.x == x &&
-                            arrowsAll[1].last.y == y) {
-                          onSelectedIndexChanged(1);
-                        } else if (arrowsAll[2].last.x == x &&
-                            arrowsAll[2].last.y == y) {
-                          onSelectedIndexChanged(2);
-                        } else if (arrowsAll[3].last.x == x &&
-                            arrowsAll[3].last.y == y) {
-                          onSelectedIndexChanged(3);
-                        }
-
                         // 経路末尾と隣接するセルにのみ移動可能
-                        Arrow lastArrow = arrowsAll[selectedIndex].last;
+                        Arrow lastArrow = arrowsAll[selectedIndex_].last;
                         if ((x - lastArrow.x).abs() + (y - lastArrow.y).abs() ==
                             1) {
                           // 手動モードで1経路追加
-                          arrowsAll[selectedIndex].add(
+                          arrowsAll[selectedIndex_].add(
                               Arrow(x, y, calcDir(lastArrow, Arrow(x, y, 0))));
+
                           // 手動モードで経路追加時に自動モードも1経路追加する
                           for (int mIdx = 0; mIdx < MOUSE_NUM; mIdx++) {
                             if (moucePathMode[mIdx] == PATH_MODE_AUTO) {
