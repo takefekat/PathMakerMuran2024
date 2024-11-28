@@ -12,6 +12,8 @@ import 'main.dart';
 import 'screenPathFind.dart';
 
 class ObjectRecognition extends StatelessWidget {
+  bool _isTapped = false; // 非同期処理実施中に2回目以降のタップを無効にするためのフラグ
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,6 +33,10 @@ class ObjectRecognition extends StatelessWidget {
                     child: Center(
                       child: InkWell(
                         onTap: () async {
+                          if (_isTapped) {
+                            return;
+                          }
+                          _isTapped = true;
                           sendMsg("mode:pathFind");
                           print("mode:pathFind");
                           List<Arrow> objs = [];
