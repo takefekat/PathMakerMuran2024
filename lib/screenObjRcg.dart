@@ -20,43 +20,12 @@ class ObjectRecognition extends StatelessWidget {
           children: [
             Expanded(
               flex: 8,
-              child: Image.asset('images/ObjectRecognition.png'),
+              child: Image.asset('images/ObjRecog.png'),
             ),
             Expanded(
               flex: 2,
               child: Row(
                 children: [
-                  //Expanded(
-                  //  flex: 2,
-                  //  child: GestureDetector(
-                  //    onTap: () {
-                  //      Navigator.pushReplacement(
-                  //        context,
-                  //        PageRouteBuilder(
-                  //          pageBuilder:
-                  //              (context, animation, secondaryAnimation) =>
-                  //                  HomeScreen(),
-                  //          transitionsBuilder: (context, animation,
-                  //              secondaryAnimation, child) {
-                  //            const begin = Offset(-1.0, 0.0);
-                  //            const end = Offset.zero;
-                  //            const curve = Curves.easeInOut;
-//
-                  //            var tween = Tween(begin: begin, end: end)
-                  //                .chain(CurveTween(curve: curve));
-                  //            var offsetAnimation = animation.drive(tween);
-//
-                  //            return SlideTransition(
-                  //              position: offsetAnimation,
-                  //              child: child,
-                  //            );
-                  //          },
-                  //        ),
-                  //      );
-                  //    },
-                  //    child: Image.asset('images/BackButton.png'),
-                  //  ),
-                  //),
                   Expanded(
                     flex: 2,
                     child: Center(
