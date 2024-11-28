@@ -25,12 +25,18 @@ class _PathFind extends State<PathFind> {
   List<int> moucePathMode = List.generate(MOUSE_NUM, (_) => 0);
   int selectedIndex = 0;
   final List<Arrow> objs;
-
+  bool _isPopupShown = false;
   @override
   _PathFind(this.objs);
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isPopupShown) {
+        _showPopup(context);
+        _isPopupShown = true;
+      }
+    });
     var orientation = MediaQuery.of(context).orientation;
     // 初期位置を設定
     if (arrowsAll[0].isEmpty) {
@@ -56,6 +62,29 @@ class _PathFind extends State<PathFind> {
             ? _buildPortraitLayout()
             : _buildLandscapeLayout(),
       ),
+    );
+  }
+
+  void _showPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset('images/PathFind.png'),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Image.asset('images/OKButton.png'),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
