@@ -11,6 +11,9 @@ import 'dart:typed_data';
 import 'screenObjRcg.dart';
 import 'screenCleaner.dart';
 
+List<int> offsetX = [0, 0, 8, 8];
+List<int> offsetY = [0, 8, 0, 8];
+
 class PathFind extends StatefulWidget {
   final List<Arrow> objs;
 
@@ -22,10 +25,11 @@ class PathFind extends StatefulWidget {
 
 class _PathFind extends State<PathFind> {
   List<List<Arrow>> arrowsAll = List.generate(MOUSE_NUM, (_) => []);
-  List<int> moucePathMode = List.generate(MOUSE_NUM, (_) => 0);
+  List<int> moucePathMode = List.generate(MOUSE_NUM, (_) => PATH_MODE_AUTO);
   int selectedIndex = 0;
   final List<Arrow> objs;
   bool _isPopupShown = false;
+  bool _initAutoPath = false;
   @override
   _PathFind(this.objs);
 
@@ -39,18 +43,40 @@ class _PathFind extends State<PathFind> {
     });
     var orientation = MediaQuery.of(context).orientation;
     // 初期位置を設定
-    if (arrowsAll[0].isEmpty) {
-      arrowsAll[0].add(Arrow(0, 0, DIR_RGT));
-      // arrowsAll[0].add(Arrow(1, 1, const Offset(0, 0))); // 32x32の場合
+    for (int i = 0; i < MOUSE_NUM; i++) {
+      if (arrowsAll[i].isEmpty && moucePathMode[i] != PATH_MODE_OFF) {
+        arrowsAll[i].add(Arrow(initPos[i].x, initPos[i].y, initPos[i].lastdir));
+      }
     }
-    if (arrowsAll[1].isEmpty) {
-      arrowsAll[1].add(Arrow(0, MAZE_SIZE - 1, DIR_UP));
-    }
-    if (arrowsAll[2].isEmpty) {
-      arrowsAll[2].add(Arrow(MAZE_SIZE - 1, 0, DIR_DWN));
-    }
-    if (arrowsAll[3].isEmpty) {
-      arrowsAll[3].add(Arrow(MAZE_SIZE - 1, MAZE_SIZE - 1, DIR_LFT));
+    //起動時に自動で経路を引く
+    if (_initAutoPath == false) {
+      _initAutoPath = true;
+      for (int i = 0; i < MOUSE_NUM; i++) {
+        arrowsAll[i].clear();
+        print("moucePathMode[$i]: ${moucePathMode[i]}");
+        // 8x8の相対座標に変換して
+        List<Arrow> objOffset = [];
+        for (Arrow obj in objs) {
+          if (obj.x - offsetX[i] < 0 ||
+              obj.x - offsetX[i] >= 8 ||
+              obj.y - offsetY[i] < 0 ||
+              obj.y - offsetY[i] >= 8) continue;
+          objOffset
+              .add(Arrow(obj.x - offsetX[i], obj.y - offsetY[i], obj.lastdir));
+        }
+
+        Arrow startOffset = Arrow(initPos[i].x - offsetX[i],
+            initPos[i].y - offsetY[i], initPos[i].lastdir);
+
+        List<Arrow> pathOffset = autoPathCalc(objOffset, startOffset);
+        // 8x8の絶対座標に戻す
+        print("len: ${pathOffset.length}");
+        for (Arrow arrow in pathOffset) {
+          print("pathOffset: ${arrow.x + offsetX[i]}, ${arrow.y + offsetY[i]}");
+          arrowsAll[i].add(
+              Arrow(arrow.x + offsetX[i], arrow.y + offsetY[i], arrow.lastdir));
+        }
+      }
     }
     return MaterialApp(
       home: Scaffold(
@@ -197,11 +223,11 @@ class _PathFind extends State<PathFind> {
                   InkWell(
                     onTap: () {
                       for (int i = 0; i < MOUSE_NUM; i++) {
-                            arrowsAll[i].clear();
+                        arrowsAll[i].clear();
                         arrowsAll[i].add(Arrow(
                             initPos[i].x, initPos[i].y, initPos[i].lastdir));
                       }
-                      },
+                    },
                     child: Image.asset('images/Restart.png', width: 300),
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
@@ -315,7 +341,7 @@ class _PathFind extends State<PathFind> {
                   InkWell(
                     onTap: () {
                       for (int i = 0; i < MOUSE_NUM; i++) {
-                          arrowsAll[i].clear();
+                        arrowsAll[i].clear();
                         arrowsAll[i].add(Arrow(
                             initPos[i].x, initPos[i].y, initPos[i].lastdir));
                       }
