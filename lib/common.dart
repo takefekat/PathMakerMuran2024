@@ -10,6 +10,13 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'screenObjRcg.dart';
 
+List<Arrow> initPos = [
+  Arrow(0, 0, DIR_RGT),
+  Arrow(0, MAZE_SIZE - 1, DIR_UP),
+  Arrow(MAZE_SIZE - 1, 0, DIR_DWN),
+  Arrow(MAZE_SIZE - 1, MAZE_SIZE - 1, DIR_LFT),
+];
+
 const int MOUSE_NUM = 4;
 const List<Color> mouceColors = [
   Colors.red,

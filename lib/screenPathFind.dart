@@ -194,17 +194,15 @@ class _PathFind extends State<PathFind> {
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
                   // リセットボタン
-                  Expanded(
-                    flex: 1,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          for (int i = 0; i < MOUSE_NUM; i++)
+                  InkWell(
+                    onTap: () {
+                      for (int i = 0; i < MOUSE_NUM; i++) {
                             arrowsAll[i].clear();
-                        });
+                        arrowsAll[i].add(Arrow(
+                            initPos[i].x, initPos[i].y, initPos[i].lastdir));
+                      }
                       },
-                      child: const Text('リセット'),
-                    ),
+                    child: Image.asset('images/Restart.png', width: 300),
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
                   Expanded(
@@ -314,14 +312,18 @@ class _PathFind extends State<PathFind> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // リセットボタン
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        for (int i = 0; i < MOUSE_NUM; i++)
+                  InkWell(
+                    onTap: () {
+                      for (int i = 0; i < MOUSE_NUM; i++) {
                           arrowsAll[i].clear();
-                      });
+                        arrowsAll[i].add(Arrow(
+                            initPos[i].x, initPos[i].y, initPos[i].lastdir));
+                      }
                     },
-                    child: const Text('リセット'),
+                    child: Image.asset(
+                      'images/Restart.png',
+                      width: 300,
+                    ),
                   ),
                   const SizedBox(width: 16), // ボタン間のスペース
                   Expanded(
