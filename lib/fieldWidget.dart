@@ -279,6 +279,26 @@ class GridPainter extends CustomPainter {
         ..color = mouceColors[i]
         ..style = PaintingStyle.fill;
       for (int j = 0; j < arrowsAll[i].length - 1; j++) {
+        // 2セルを跨ぐように長方形を描画
+        const double offset = 0.35;
+        // セルj
+        double x1UL = (arrowsAll[i][j].x + offset) * cellSize; // 左上 x
+        double y1UL = (arrowsAll[i][j].y + offset) * cellSize; // 左上 y
+        double x1DR = (arrowsAll[i][j].x + (1 - offset)) * cellSize; // 右下 x
+        double y1DR = (arrowsAll[i][j].y + (1 - offset)) * cellSize; // 右下 x
+        // セルj+1
+        double x2UL = (arrowsAll[i][j + 1].x + offset) * cellSize; // 左上 x
+        double y2UL = (arrowsAll[i][j + 1].y + offset) * cellSize; // 左上 y
+        double x2DR = (arrowsAll[i][j + 1].x + (1 - offset)) * cellSize; // 右下 x
+        double y2DR = (arrowsAll[i][j + 1].y + (1 - offset)) * cellSize; // 右下 y
+
+        double minX = min(min(x1UL, x2UL), min(x1DR, x2DR));
+        double minY = min(min(y1UL, y2UL), min(y1DR, y2DR));
+        double maxX = max(max(x1UL, x2UL), max(x1DR, x2DR));
+        double maxY = max(max(y1UL, y2UL), max(y1DR, y2DR));
+        canvas.drawRect(Rect.fromLTRB(minX, minY, maxX, maxY), arrowPaint);
+
+        /*
         int dx = arrowsAll[i][j + 1].x - arrowsAll[i][j].x; // x方向の変化向き
         int dy = arrowsAll[i][j + 1].y - arrowsAll[i][j].y; // y方向の変化向き
 
@@ -337,6 +357,7 @@ class GridPainter extends CustomPainter {
         path.lineTo(arrowX + p8.x, arrowY + p8.y);
         path.close();
         canvas.drawPath(path, arrowPaint);
+        */
       }
       // 経路の末尾にダイヤを描画
       if (arrowsAll[i].isNotEmpty) {
