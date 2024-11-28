@@ -15,100 +15,88 @@ class CleanerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            Expanded(
-              flex: 8,
-              child: Image.asset('images/Cleaner.png'),
-            ),
-            Expanded(
-              flex: 2,
-              child: Row(
+      body: Column(
+        children: [
+          Expanded(
+            flex: 9,
+            child: Center(
+              child: Stack(
+                alignment: Alignment.center,
+                fit: StackFit.loose,
                 children: [
-                  Expanded(
-                      flex: 2,
-                      child: Row(
-                        children: [
-                          // スタートボタン
-                          ElevatedButton(
+                  Image.asset('images/Cleaner.png'),
+                  Align(
+                    alignment: Alignment(0.0, 0.6),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // スタートボタン
+                        SizedBox(
+                          width: 450, // Cleaner.pngの幅に合わせて設定
+                          height: 100, // Cleaner.pngの高さに合わせて設定
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                            ),
                             onPressed: () {
-                              // スタートボタンが押されたときの処理
                               print('Start button pressed');
                               sendMsg('start');
                             },
-                            child: Text('スタート'),
+                            child: Image.asset('images/StartButton.png'),
                           ),
-                          const SizedBox(height: 32), // ボタン間のスペース
-                          // ストップボタン
-                          ElevatedButton(
+                        ),
+                        const SizedBox(width: 32), // ボタン間のスペース
+                        // ストップボタン
+                        SizedBox(
+                          width: 450, // Cleaner.pngの幅に合わせて設定
+                          height: 100, // Cleaner.pngの高さに合わせて設定
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                            ),
                             onPressed: () {
-                              // ストップボタンが押されたときの処理
-                              print('Start button pressed');
+                              print('Stop button pressed');
                               sendMsg('stop');
                             },
-                            child: Text('ストップ'),
+                            child: Image.asset('images/StopButton.png'),
                           ),
-                        ],
-                      )),
-                  /*
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    PathFind(),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              const begin = Offset(-1.0, 0.0);
-                              const end = Offset.zero;
-                              const curve = Curves.easeInOut;
-
-                              var tween = Tween(begin: begin, end: end)
-                                  .chain(CurveTween(curve: curve));
-                              var offsetAnimation = animation.drive(tween);
-
-                              return SlideTransition(
-                                position: offsetAnimation,
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      child: Image.asset('images/BackButton.png'),
-                    ),
-                  ),
-                  */
-                  Expanded(
-                    flex: 2,
-                    child: Center(
-                      child: InkWell(
-                        onTap: () {
-                          print("mode:home");
-                          sendMsg("mode:home");
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomeScreen()),
-                          ).then((value) {
-                            print("mode:cleaner");
-                            sendMsg("mode:cleaner");
-                          });
-                        },
-                        child: Image.asset('images/FinishButton.png'),
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Center(
+                    child: InkWell(
+                      onTap: () {
+                        print("mode:home");
+                        sendMsg("mode:home");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                        ).then((value) {
+                          print("mode:cleaner");
+                          sendMsg("mode:cleaner");
+                        });
+                      },
+                      child: Image.asset('images/FinishButton.png'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
