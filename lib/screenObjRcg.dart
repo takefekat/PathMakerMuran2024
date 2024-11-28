@@ -17,56 +17,68 @@ class ObjectRecognition extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            Expanded(
-              flex: 8,
-              child: Image.asset('images/ObjRecog.png'),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('images/BackGround.png'), // 画像のパスを指定
+            fit: BoxFit.cover, // 画面いっぱいに表示
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.5), // 透明度を設定
+              BlendMode.dstATop,
             ),
-            Expanded(
-              flex: 2,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Center(
-                      child: InkWell(
-                        onTap: () async {
-                          if (_isTapped) {
-                            return;
-                          }
-                          _isTapped = true;
-                          sendMsg("mode:pathFind");
-                          print("mode:pathFind");
-                          List<Arrow> objs = [];
+          ),
+        ),
+        child: Center(
+          child: Column(
+            children: [
+              Expanded(
+                flex: 8,
+                child: Image.asset('images/ObjRecog.png'),
+              ),
+              Expanded(
+                flex: 2,
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Center(
+                        child: InkWell(
+                          onTap: () async {
+                            if (_isTapped) {
+                              return;
+                            }
+                            _isTapped = true;
+                            sendMsg("mode:pathFind");
+                            print("mode:pathFind");
+                            List<Arrow> objs = [];
 
-                          final response = await sendRecvMsg("get_path");
-                          if (response != "") {
-                            final jsonResponse = json.decode(response);
+                            final response = await sendRecvMsg("get_path");
+                            if (response != "") {
+                              final jsonResponse = json.decode(response);
 
-                            jsonResponse['objs'].forEach((obj) {
-                              objs.add(Arrow(obj['x'], obj['y'], 0));
+                              jsonResponse['objs'].forEach((obj) {
+                                objs.add(Arrow(obj['x'], obj['y'], 0));
+                              });
+                            }
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PathFind(objs: objs)),
+                            ).then((value) {
+                              print("mode:objRecg");
+                              sendMsg("mode:objRecg");
                             });
-                          }
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PathFind(objs: objs)),
-                          ).then((value) {
-                            print("mode:objRecg");
-                            sendMsg("mode:objRecg");
-                          });
-                        },
-                        child: Image.asset('images/NextButton.png'),
+                          },
+                          child: Image.asset('images/NextButton.png'),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
