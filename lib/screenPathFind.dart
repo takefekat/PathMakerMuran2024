@@ -72,7 +72,7 @@ class _PathFind extends State<PathFind> {
         // 8x8の絶対座標に戻す
         print("len: ${pathOffset.length}");
         for (Arrow arrow in pathOffset) {
-          print("pathOffset: ${arrow.x + offsetX[i]}, ${arrow.y + offsetY[i]}");
+          //print("pathOffset: ${arrow.x + offsetX[i]}, ${arrow.y + offsetY[i]}");
           arrowsAll[i].add(
               Arrow(arrow.x + offsetX[i], arrow.y + offsetY[i], arrow.lastdir));
         }

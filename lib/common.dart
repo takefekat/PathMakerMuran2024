@@ -25,6 +25,20 @@ const List<Color> mouceColors = [
   Colors.yellow
 ];
 
+// 上下左右に移動
+const List<List<int>> directions = [
+  [0, 1], // 右
+  [1, 0], // 下
+  [0, -1], // 左
+  [-1, 0] // 上
+];
+const List<int> dxs = [1, 0, -1, 0]; // 右、下、左、上
+const List<int> dys = [0, 1, 0, -1]; // 右、下、左、上
+const int RIGHT = 0;
+const int DOWN = 1;
+const int LEFT = 2;
+const int UP = 3;
+const int DIRECTION_NUM = 4;
 const int PORT = 1251;
 
 const int PATH_MODE_MANUAL = 0;
@@ -39,8 +53,6 @@ const int DIR_DWN = 1;
 const int DIR_LFT = 2;
 const int DIR_UP = 3;
 const int DIR_NUM = 4;
-const List<int> dxs = [1, 0, -1, 0]; // 右、下、左、上
-const List<int> dys = [0, 1, 0, -1]; // 右、下、左、上
 
 const ip = '192.168.251.3'; // PCのIPアドレス
 const port = PORT; // PCのポート
@@ -120,11 +132,37 @@ Future<String> sendRecvMsg(String msg) async {
 // ただし、障害物は通れない(objs)
 const int REL_MAZE_SIZE = 8;
 List<Arrow> autoPathCalc(List<Arrow> objs, Arrow start) {
+  DateTime start_time = DateTime.now();
+
   List<Arrow> paths = [];
+  List<Arrow> pathsBest = [];
   List<List<bool>> visited =
       List.generate(REL_MAZE_SIZE, (_) => List.filled(REL_MAZE_SIZE, false));
   List<List<bool>> obstacles =
       List.generate(REL_MAZE_SIZE, (_) => List.filled(REL_MAZE_SIZE, false));
+  List<List<int>> order =
+      List.generate(REL_MAZE_SIZE, (_) => List.filled(REL_MAZE_SIZE, 0));
+
+  // 頂点の次数を初期化
+  for (int x = 0; x < REL_MAZE_SIZE; x++) {
+    for (int y = 0; y < REL_MAZE_SIZE; y++) {
+      if (x == 0 ||
+          x == REL_MAZE_SIZE - 1 ||
+          y == 0 ||
+          y == REL_MAZE_SIZE - 1) {
+        if (0 < x || x < REL_MAZE_SIZE - 1 || 0 < y || y < REL_MAZE_SIZE - 1) {
+          // 4隅以外の周囲: 3
+          order[x][y] = 3;
+        } else {
+          // 4隅: 2
+          order[x][y] = 2;
+        }
+      } else {
+        // 中: 4
+        order[x][y] = 4;
+      }
+    }
+  }
 
   // 障害物の位置を設定
   for (var obj in objs) {
@@ -133,7 +171,12 @@ List<Arrow> autoPathCalc(List<Arrow> objs, Arrow start) {
     }
   }
 
-  bool dfs(int x, int y) {
+  bool dfs(int x, int y, int lastdir) {
+    // 制限時間を超えた場合
+    if (DateTime.now().difference(start_time).inSeconds > 1) {
+      return false;
+    }
+
     // 範囲外または障害物または訪問済みの場合
     if (x < 0 ||
         x >= REL_MAZE_SIZE ||
@@ -147,34 +190,108 @@ List<Arrow> autoPathCalc(List<Arrow> objs, Arrow start) {
     // 現在の位置を訪問済みにする
     visited[x][y] = true;
     paths.add(Arrow(x, y, 0));
+    int tmp_order = order[x][y];
+    order[x][y] = 0;
 
     // 全ての頂点を訪問した場合
     if (paths.length == REL_MAZE_SIZE * REL_MAZE_SIZE - objs.length) {
       return true;
     }
+    // これまで最も長いパスの場合
+    if (paths.length > pathsBest.length) {
+      pathsBest = List.from(paths);
+    }
 
-    // 上下左右に移動
-    List<List<int>> directions = [
-      [0, 1], // 右
-      [1, 0], // 下
-      [0, -1], // 左
-      [-1, 0] // 上
-    ];
+    // 探索方向の優先度づけ
+    List<List<int>> dirs = [];
+    for (int i = 0; i < DIRECTION_NUM; i++) {
+      int dir = (lastdir + i) % DIRECTION_NUM;
+      int nxt_x = x + dxs[dir];
+      int nxt_y = y + dys[dir];
 
-    for (var dir in directions) {
-      if (dfs(x + dir[0], y + dir[1])) {
+      // 範囲外または障害物または訪問済みの場合は探索しない
+      if (nxt_x < 0 ||
+          nxt_x >= REL_MAZE_SIZE ||
+          nxt_y < 0 ||
+          nxt_y >= REL_MAZE_SIZE ||
+          obstacles[nxt_x][nxt_y] ||
+          visited[nxt_x][nxt_y]) {
+        continue;
+      }
+
+      // dir方向に移動したことで、他の周りの頂点の次数が1になる場合は後回し
+      int order1_ctr = 0;
+      for (int j = 0; j < DIRECTION_NUM; j++) {
+        int other_x = x + dxs[j];
+        int other_y = y + dys[j];
+        if (other_x < 0 ||
+            other_x >= REL_MAZE_SIZE ||
+            other_y < 0 ||
+            other_y >= REL_MAZE_SIZE ||
+            obstacles[other_x][other_y] ||
+            visited[other_x][other_y]) {
+          continue;
+        }
+        if (order[other_x][other_y] == 2) {
+          order1_ctr++;
+        }
+      }
+      // 1. 移動することで行き止まり（次数1）が増える場合は後回し
+      // 2. 前回方向を優先する
+      dirs.add([order1_ctr, i, dir]);
+    }
+
+    //for (var dir in directions) {
+    for (List<int> dir in dirs) {
+      int nxt_x = x + dxs[dir[2]];
+      int nxt_y = y + dys[dir[2]];
+
+      // 次数orderを計算
+      for (int i = 0; i < DIRECTION_NUM; i++) {
+        int other_x = x + dxs[i];
+        int other_y = y + dys[i];
+        if (other_x < 0 ||
+            other_x >= REL_MAZE_SIZE ||
+            other_y < 0 ||
+            other_y >= REL_MAZE_SIZE ||
+            obstacles[other_x][other_y] ||
+            visited[other_x][other_y]) {
+          continue;
+        }
+        order[other_x][other_y]--;
+      }
+
+      if (dfs(nxt_x, nxt_y, dir[2])) {
         return true;
+      }
+
+      // 次数orderを戻す
+      for (int i = 0; i < DIRECTION_NUM; i++) {
+        int other_x = x + dxs[i];
+        int other_y = y + dys[i];
+        if (other_x < 0 ||
+            other_x >= REL_MAZE_SIZE ||
+            other_y < 0 ||
+            other_y >= REL_MAZE_SIZE ||
+            obstacles[other_x][other_y] ||
+            visited[other_x][other_y]) {
+          continue;
+        }
+        order[other_x][other_y]++;
       }
     }
 
     // 戻る
     visited[x][y] = false;
     paths.removeLast();
+    order[x][y] = tmp_order;
     return false;
   }
 
   // スタート地点からDFSを開始
-  dfs(start.x, start.y);
+  if (dfs(start.x, start.y, start.lastdir) == false) {
+    paths = List.from(pathsBest);
+  }
 
   return paths;
 }
