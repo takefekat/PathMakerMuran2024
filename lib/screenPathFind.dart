@@ -14,13 +14,18 @@ import 'screenCleaner.dart';
 List<int> offsetX = [0, 0, 8, 8];
 List<int> offsetY = [0, 8, 0, 8];
 
+const int PATH_CALC_MODE = 1; // 0: 深さ優先探索 1: ZDD
+const int PATH_CALC_MODE_DFS = 0;
+const int PATH_CALC_MODE_ZDD = 1;
+
 class PathFind extends StatefulWidget {
   final List<Arrow> objs;
+  final List<List<Arrow>> paths;
 
-  PathFind({required this.objs});
+  PathFind({required this.objs, required this.paths});
 
   @override
-  _PathFind createState() => _PathFind(objs);
+  _PathFind createState() => _PathFind(objs, paths);
 }
 
 class _PathFind extends State<PathFind> {
@@ -28,10 +33,11 @@ class _PathFind extends State<PathFind> {
   List<int> moucePathMode = List.generate(MOUSE_NUM, (_) => PATH_MODE_AUTO);
   int selectedIndex = 0;
   final List<Arrow> objs;
+  final List<List<Arrow>> paths;
   bool _isPopupShown = false;
   bool _initAutoPath = false;
   @override
-  _PathFind(this.objs);
+  _PathFind(this.objs, this.paths);
 
   @override
   Widget build(BuildContext context) {
@@ -50,32 +56,37 @@ class _PathFind extends State<PathFind> {
     }
     //起動時に自動で経路を引く
     if (_initAutoPath == false) {
-      _initAutoPath = true;
-      for (int i = 0; i < MOUSE_NUM; i++) {
-        arrowsAll[i].clear();
-        print("moucePathMode[$i]: ${moucePathMode[i]}");
-        // 8x8の相対座標に変換して
-        List<Arrow> objOffset = [];
-        for (Arrow obj in objs) {
-          if (obj.x - offsetX[i] < 0 ||
-              obj.x - offsetX[i] >= 8 ||
-              obj.y - offsetY[i] < 0 ||
-              obj.y - offsetY[i] >= 8) continue;
-          objOffset
-              .add(Arrow(obj.x - offsetX[i], obj.y - offsetY[i], obj.lastdir));
-        }
+      if (PATH_CALC_MODE == PATH_CALC_MODE_DFS) {
+        _initAutoPath = true;
+        for (int i = 0; i < MOUSE_NUM; i++) {
+          arrowsAll[i].clear();
+          print("moucePathMode[$i]: ${moucePathMode[i]}");
+          // 8x8の相対座標に変換して
+          List<Arrow> objOffset = [];
+          for (Arrow obj in objs) {
+            if (obj.x - offsetX[i] < 0 ||
+                obj.x - offsetX[i] >= 8 ||
+                obj.y - offsetY[i] < 0 ||
+                obj.y - offsetY[i] >= 8) continue;
+            objOffset.add(
+                Arrow(obj.x - offsetX[i], obj.y - offsetY[i], obj.lastdir));
+          }
 
-        Arrow startOffset = Arrow(initPos[i].x - offsetX[i],
-            initPos[i].y - offsetY[i], initPos[i].lastdir);
+          Arrow startOffset = Arrow(initPos[i].x - offsetX[i],
+              initPos[i].y - offsetY[i], initPos[i].lastdir);
 
-        List<Arrow> pathOffset = autoPathCalc(objOffset, startOffset);
-        // 8x8の絶対座標に戻す
-        print("len: ${pathOffset.length}");
-        for (Arrow arrow in pathOffset) {
-          //print("pathOffset: ${arrow.x + offsetX[i]}, ${arrow.y + offsetY[i]}");
-          arrowsAll[i].add(
-              Arrow(arrow.x + offsetX[i], arrow.y + offsetY[i], arrow.lastdir));
+          List<Arrow> pathOffset = autoPathCalc(objOffset, startOffset);
+          // 8x8の絶対座標に戻す
+          print("len: ${pathOffset.length}");
+          for (Arrow arrow in pathOffset) {
+            //print("pathOffset: ${arrow.x + offsetX[i]}, ${arrow.y + offsetY[i]}");
+            arrowsAll[i].add(Arrow(
+                arrow.x + offsetX[i], arrow.y + offsetY[i], arrow.lastdir));
+          }
         }
+      } else {
+        // ZDD
+        arrowsAll = paths;
       }
     }
     return MaterialApp(

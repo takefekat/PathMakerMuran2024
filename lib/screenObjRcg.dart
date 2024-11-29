@@ -51,6 +51,12 @@ class ObjectRecognition extends StatelessWidget {
                             sendMsg("mode:pathFind");
                             print("mode:pathFind");
                             List<Arrow> objs = [];
+                            List<List<Arrow>> paths = [
+                              [],
+                              [],
+                              [],
+                              [],
+                            ];
 
                             final response = await sendRecvMsg("get_path");
                             if (response != "") {
@@ -61,10 +67,29 @@ class ObjectRecognition extends StatelessWidget {
                               });
                             }
 
+                            final path_set = await sendRecvMsg("get_auto_path");
+                            if (path_set != "") {
+                              final jsonResponse = json.decode(path_set);
+
+                              jsonResponse['mouce0'].forEach((node) {
+                                paths[0].add(Arrow(node['x'], node['y'], 0));
+                              });
+                              jsonResponse['mouce1'].forEach((node) {
+                                paths[1].add(Arrow(node['x'], node['y'], 0));
+                              });
+                              jsonResponse['mouce2'].forEach((node) {
+                                paths[2].add(Arrow(node['x'], node['y'], 0));
+                              });
+                              jsonResponse['mouce3'].forEach((node) {
+                                paths[3].add(Arrow(node['x'], node['y'], 0));
+                              });
+                            }
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => PathFind(objs: objs)),
+                                  builder: (context) =>
+                                      PathFind(objs: objs, paths: paths)),
                             ).then((value) {
                               print("mode:objRecg");
                               sendMsg("mode:objRecg");
