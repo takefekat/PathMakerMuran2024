@@ -14,9 +14,9 @@ import 'screenCleaner.dart';
 List<int> offsetX = [0, 0, 8, 8];
 List<int> offsetY = [0, 8, 0, 8];
 
-const int PATH_CALC_MODE = 1; // 0: 深さ優先探索 1: ZDD
 const int PATH_CALC_MODE_DFS = 0;
 const int PATH_CALC_MODE_ZDD = 1;
+const int PATH_CALC_MODE = PATH_CALC_MODE_DFS; // 0: 深さ優先探索 1: ZDD
 
 class PathFind extends StatefulWidget {
   final List<Arrow> objs;
@@ -54,6 +54,7 @@ class _PathFind extends State<PathFind> {
         arrowsAll[i].add(Arrow(initPos[i].x, initPos[i].y, initPos[i].lastdir));
       }
     }
+
     //起動時に自動で経路を引く
     if (_initAutoPath == false) {
       if (PATH_CALC_MODE == PATH_CALC_MODE_DFS) {
@@ -86,7 +87,11 @@ class _PathFind extends State<PathFind> {
         }
       } else {
         // ZDD
-        arrowsAll = paths;
+        for (int i = 0; i < MOUSE_NUM; i++) {
+          if (paths[i].isNotEmpty) {
+            arrowsAll[i] = paths[i];
+          }
+        }
       }
     }
     return MaterialApp(
