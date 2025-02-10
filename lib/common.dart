@@ -173,7 +173,7 @@ List<Arrow> autoPathCalc(List<Arrow> objs, Arrow start) {
 
   bool dfs(int x, int y, int lastdir) {
     // 制限時間を超えた場合
-    if (DateTime.now().difference(start_time).inSeconds > 1) {
+    if (DateTime.now().difference(start_time).inSeconds > 0.5) {
       return false;
     }
 

@@ -100,6 +100,7 @@ class FieldWidget extends StatelessWidget {
             .add(Arrow(x, y, calcDir(lastArrow, Arrow(x, y, 0))));
 
         // 手動モードで経路追加時に自動モードも1経路追加する
+        /*
         for (int mIdx = 0; mIdx < MOUSE_NUM; mIdx++) {
           if (moucePathMode[mIdx] == PATH_MODE_AUTO) {
             // 前回の方向に進めるなら進む
@@ -194,6 +195,7 @@ class FieldWidget extends StatelessWidget {
             }
           }
         }
+        */
       }
     }
   }
