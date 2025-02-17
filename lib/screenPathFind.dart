@@ -176,79 +176,113 @@ class _PathFind extends State<PathFind> {
                 children: [
                   const SizedBox(height: 32), // ボタン間のスペース
                   Expanded(
-                    flex: 2,
-                    child: CustomDropdown(
-                      selectedValue: moucePathMode[0],
-                      mouceIndex: 0,
-                      onChanged: (int? value) {
+                    flex: 1,
+                    child: Container(
+                      alignment: Alignment.center, // スイッチを中央に配置
+                      child: Transform.scale(
+                        scale: 3, // スイッチのサイズを1.5倍に拡大
+                        child: Switch(
+                          value:
+                              moucePathMode[0] == PATH_MODE_OFF ? false : true,
+                          onChanged: (bool value) {
                         setState(() {
-                          moucePathMode[0] = value!;
-                          if (value == PATH_MODE_OFF) {
+                              moucePathMode[0] =
+                                  value ? PATH_MODE_AUTO : PATH_MODE_OFF;
+                              if (value) {
                             arrowsAll[0].clear();
+                                arrowsAll[0].add(Arrow(0, 0, 0));
                           } else {
                             arrowsAll[0].clear();
-                            arrowsAll[0].add(Arrow(0, 0, 0));
                           }
                         });
                       },
+                          activeColor: Colors.red, // スイッチのアクティブカラーを赤色に設定
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
                   Expanded(
-                    flex: 2,
-                    child: CustomDropdown(
-                      selectedValue: moucePathMode[1],
-                      mouceIndex: 1,
-                      onChanged: (int? value) {
+                    flex: 1,
+                    child: Container(
+                      alignment: Alignment.center, // スイッチを中央に配置
+                      child: Transform.scale(
+                        scale: 3, // スイッチのサイズを1.5倍に拡大
+                        child: Switch(
+                          value:
+                              moucePathMode[1] == PATH_MODE_OFF ? false : true,
+                          onChanged: (bool value) {
                         setState(() {
-                          moucePathMode[1] = value!;
-                          if (value == PATH_MODE_OFF) {
+                              moucePathMode[1] =
+                                  value ? PATH_MODE_AUTO : PATH_MODE_OFF;
+                              if (value) {
                             arrowsAll[1].clear();
+                                arrowsAll[1]
+                                    .add(Arrow(0, MAZE_SIZE - 1, DIR_UP));
                           } else {
                             arrowsAll[1].clear();
-                            arrowsAll[1].add(Arrow(0, MAZE_SIZE - 1, DIR_UP));
                           }
                         });
                       },
+                          activeColor: Colors.blue, // スイッチのアクティブカラーを赤色に設定
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
                   Expanded(
-                    flex: 2,
-                    child: CustomDropdown(
-                      selectedValue: moucePathMode[2],
-                      mouceIndex: 2,
-                      onChanged: (int? value) {
+                    flex: 1,
+                    child: Container(
+                      alignment: Alignment.center, // スイッチを中央に配置
+                      child: Transform.scale(
+                        scale: 3, // スイッチのサイズを1.5倍に拡大
+                        child: Switch(
+                          value:
+                              moucePathMode[2] == PATH_MODE_OFF ? false : true,
+                          onChanged: (bool value) {
                         setState(() {
-                          moucePathMode[2] = value!;
-                          if (value == PATH_MODE_OFF) {
+                              moucePathMode[2] =
+                                  value ? PATH_MODE_AUTO : PATH_MODE_OFF;
+                              if (value) {
                             arrowsAll[2].clear();
+                                arrowsAll[2]
+                                    .add(Arrow(MAZE_SIZE - 1, 0, DIR_DWN));
                           } else {
                             arrowsAll[2].clear();
-                            arrowsAll[2].add(Arrow(MAZE_SIZE - 1, 0, DIR_DWN));
                           }
                         });
                       },
+                          activeColor: Colors.green, // スイッチのアクティブカラーを赤色に設定
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
                   Expanded(
-                    flex: 2,
-                    child: CustomDropdown(
-                      selectedValue: moucePathMode[3],
-                      mouceIndex: 3,
-                      onChanged: (int? value) {
+                    flex: 1,
+                    child: Container(
+                      alignment: Alignment.center, // スイッチを中央に配置
+                      child: Transform.scale(
+                        scale: 3, // スイッチのサイズを1.5倍に拡大
+                        child: Switch(
+                          value:
+                              moucePathMode[3] == PATH_MODE_OFF ? false : true,
+                          onChanged: (bool value) {
                         setState(() {
-                          moucePathMode[3] = value!;
-                          if (value == PATH_MODE_OFF) {
+                              moucePathMode[3] =
+                                  value ? PATH_MODE_AUTO : PATH_MODE_OFF;
+                              if (value) {
                             arrowsAll[3].clear();
+                                arrowsAll[3].add(Arrow(
+                                    MAZE_SIZE - 1, MAZE_SIZE - 1, DIR_LFT));
                           } else {
                             arrowsAll[3].clear();
-                            arrowsAll[3].add(
-                                Arrow(MAZE_SIZE - 1, MAZE_SIZE - 1, DIR_LFT));
                           }
                         });
                       },
+                          activeColor: Colors.yellow, // スイッチのアクティブカラーを赤色に設定
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
