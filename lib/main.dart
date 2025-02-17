@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'screenObjRcg.dart';
 import 'package:video_player/video_player.dart';
+import 'config.dart';
 
 void main() {
   runApp(MyApp());
@@ -65,12 +66,34 @@ class _HomeScreen extends State<HomeScreen> {
           });
         },
         child: Center(
-          child: _controller.value.isInitialized
+          child: DESIGN_MODE == MODE_DN
+              ? (_controller.value.isInitialized
               ? AspectRatio(
                   aspectRatio: _controller.value.aspectRatio,
                   child: VideoPlayer(_controller),
                 )
-              : CircularProgressIndicator(),
+                  : CircularProgressIndicator())
+              : Stack(
+                  children: [
+                    // 背景画像
+                    Positioned.fill(
+                      child: Image.asset(
+                        'images/06.jpg',
+                        fit: BoxFit.cover,
+                        color: Colors.black.withOpacity(0.3), // 透明度を設定
+                        colorBlendMode: BlendMode.dstATop, // ブレンドモードを設定
+                      ),
+                    ),
+                    // 中央に配置されたアイコン
+                    Center(
+                      child: Image.asset(
+                        'images/icon.png',
+                        //width: 100, // アイコンの幅を指定
+                        //height: 100, // アイコンの高さを指定
+                      ),
+                    ),
+                  ],
+                ),
         ),
       ),
     );

@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'main.dart';
 import 'screenPathFind.dart';
+import 'config.dart';
 
 class ObjectRecognition extends StatelessWidget {
   bool _isTapped = false; // 非同期処理実施中に2回目以降のタップを無効にするためのフラグ
@@ -20,7 +21,9 @@ class ObjectRecognition extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('images/BackGround.png'), // 画像のパスを指定
+            image: DESIGN_MODE == MODE_DN
+                ? AssetImage('images/BackGround.png')
+                : AssetImage('images/06.jpg'), // 画像のパスを指定
             fit: BoxFit.cover, // 画面いっぱいに表示
             colorFilter: ColorFilter.mode(
               Colors.black.withOpacity(0.5), // 透明度を設定
@@ -33,7 +36,9 @@ class ObjectRecognition extends StatelessWidget {
             children: [
               Expanded(
                 flex: 8,
-                child: Image.asset('images/ObjRecog.png'),
+                child: DESIGN_MODE == MODE_DN
+                    ? Image.asset('images/ObjRecog.png')
+                    : Image.asset('images/ObjRecogJQ.png'),
               ),
               Expanded(
                 flex: 2,
@@ -95,7 +100,9 @@ class ObjectRecognition extends StatelessWidget {
                               sendMsg("mode:objRecg");
                             });
                           },
-                          child: Image.asset('images/NextButton.png'),
+                          child: DESIGN_MODE == MODE_DN
+                              ? Image.asset('images/NextButton.png')
+                              : Image.asset('images/NextJQ.png'),
                         ),
                       ),
                     ),

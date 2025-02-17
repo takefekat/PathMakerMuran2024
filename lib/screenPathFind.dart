@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:path_maker/config.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'fieldWidget.dart';
@@ -112,16 +113,32 @@ class _PathFind extends State<PathFind> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+          content: Stack(
+            alignment: Alignment.center,
+            fit: StackFit.loose,
             children: [
-              Image.asset('images/PathFind.png'),
-              SizedBox(height: 20),
-              ElevatedButton(
+              DESIGN_MODE == MODE_DN
+                  ? Image.asset('images/PathFind.png')
+                  : Image.asset('images/PathFindJQ.png'),
+              //SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+              Positioned(
+                bottom: MediaQuery.of(context).size.height * 0.025,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent, // 背景色を透明に設定
+                    shadowColor: Colors.transparent, // 影の色を透明に設定
+                  ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Image.asset('images/OKButton.png'),
+                  child: SizedBox(
+                    //width: MediaQuery.of(context).size.width * 0.1,
+                    height: MediaQuery.of(context).size.height * 0.1,
+                    child: DESIGN_MODE == MODE_DN
+                        ? Image.asset('images/OKButton.png')
+                        : Image.asset('images/OKJQ.png'),
+                  ),
+                ),
               ),
             ],
           ),
@@ -244,7 +261,9 @@ class _PathFind extends State<PathFind> {
                             initPos[i].x, initPos[i].y, initPos[i].lastdir));
                       }
                     },
-                    child: Image.asset('images/Restart.png', width: 300),
+                    child: DESIGN_MODE == MODE_DN
+                        ? Image.asset('images/Restart.png', width: 300)
+                        : Image.asset('images/RerunJQ.png', width: 300),
                   ),
                   const SizedBox(height: 32), // ボタン間のスペース
                   Expanded(
@@ -264,7 +283,11 @@ class _PathFind extends State<PathFind> {
                             sendMsg("mode:pathFind");
                           });
                         },
-                        child: Image.asset('images/NextButton.png'),
+                        child: DESIGN_MODE == MODE_DN
+                            ? Image.asset('images/NextButton.png',
+                                width: 300, height: 100)
+                            : Image.asset('images/NextJQ.png',
+                                width: 300, height: 100),
                       ),
                     ),
                   ),

@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'main.dart';
 import 'screenPathFind.dart';
+import 'config.dart';
 
 class CleanerScreen extends StatelessWidget {
   @override
@@ -18,7 +19,9 @@ class CleanerScreen extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('images/BackGround.png'), // 画像のパスを指定
+            image: DESIGN_MODE == MODE_DN
+                ? AssetImage('images/BackGround.png')
+                : AssetImage('images/06.jpg'), // 画像のパスを指定
             fit: BoxFit.cover, // 画面いっぱいに表示
             colorFilter: ColorFilter.mode(
               Colors.black.withOpacity(0.5), // 透明度を設定
@@ -35,16 +38,18 @@ class CleanerScreen extends StatelessWidget {
                   alignment: Alignment.center,
                   fit: StackFit.loose,
                   children: [
-                    Image.asset('images/Cleaner.png'),
-                    Align(
-                      alignment: Alignment(0.0, 0.6),
+                    DESIGN_MODE == MODE_DN
+                        ? Image.asset('images/Cleaner.png')
+                        : Image.asset('images/CleanerJQ.png'),
+                    Positioned(
+                      bottom: MediaQuery.of(context).size.height *
+                          0.05, // 画面の高さの10%を指定
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           // スタートボタン
                           SizedBox(
-                            width: 450, // Cleaner.pngの幅に合わせて設定
-                            height: 100, // Cleaner.pngの高さに合わせて設定
+                            height: MediaQuery.of(context).size.height * 0.1,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
@@ -54,14 +59,15 @@ class CleanerScreen extends StatelessWidget {
                                 print('Start button pressed');
                                 sendMsg('start');
                               },
-                              child: Image.asset('images/StartButton.png'),
+                              child: DESIGN_MODE == MODE_DN
+                                  ? Image.asset('images/StartButton.png')
+                                  : Image.asset('images/StartButtonJQ.png'),
                             ),
                           ),
                           const SizedBox(width: 32), // ボタン間のスペース
                           // ストップボタン
                           SizedBox(
-                            width: 450, // Cleaner.pngの幅に合わせて設定
-                            height: 100, // Cleaner.pngの高さに合わせて設定
+                            height: MediaQuery.of(context).size.height * 0.1,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
@@ -71,7 +77,9 @@ class CleanerScreen extends StatelessWidget {
                                 print('Stop button pressed');
                                 sendMsg('stop');
                               },
-                              child: Image.asset('images/StopButton.png'),
+                              child: DESIGN_MODE == MODE_DN
+                                  ? Image.asset('images/StopButton.png')
+                                  : Image.asset('images/StopButtonJQ.png'),
                             ),
                           ),
                         ],
@@ -101,7 +109,12 @@ class CleanerScreen extends StatelessWidget {
                             sendMsg("mode:cleaner");
                           });
                         },
-                        child: Image.asset('images/FinishButton.png'),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.2,
+                          child: DESIGN_MODE == MODE_DN
+                              ? Image.asset('images/FinishButton.png')
+                              : Image.asset('images/DOneJQ.png'),
+                        ),
                       ),
                     ),
                   ),
