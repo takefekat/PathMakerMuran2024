@@ -9,6 +9,7 @@ import 'dart:async'; // Timerクラスを使用するために必要
 import 'dart:convert';
 import 'dart:typed_data';
 import 'screenObjRcg.dart';
+import 'screenPathFind.dart';
 import 'package:video_player/video_player.dart';
 import 'config.dart';
 
@@ -32,46 +33,59 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreen extends State<HomeScreen> {
   late VideoPlayerController _controller;
+  bool _isTapped = false; // 非同期処理実施中に2回目以降のタップを無効にするためのフラグ
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset('images/home.mp4')
-      ..initialize().then((_) {
-        setState(() {});
-        _controller.play();
-        _controller.setLooping(true);
-      });
+    if (DESIGN_MODE == MODE_DN) {
+      _controller = VideoPlayerController.asset('images/home.mp4')
+        ..initialize().then((_) {
+          setState(() {});
+          _controller.play();
+          _controller.setLooping(true);
+        });
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
-    _controller.dispose();
+    if (DESIGN_MODE == MODE_DN) {
+      _controller.dispose();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: GestureDetector(
-        onTap: () {
-          print("mode:objRcg");
-          sendMsg("mode:objRcg");
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ObjectRecognition()),
-          ).then((value) {
-            print("mode:home");
-            sendMsg("mode:home");
-          });
+        onTap: () async {
+          if (DESIGN_MODE == MODE_DN || DESIGN_MODE == MODE_JQ) {
+            print("mode:objRcg");
+            sendMsg("mode:objRcg");
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ObjectRecognition()),
+            ).then((value) {
+              print("mode:home");
+              sendMsg("mode:home");
+            });
+          } else {
+            if (_isTapped) {
+              return;
+            }
+            _isTapped = true;
+            handleTap(context);
+          }
         },
         child: Center(
           child: DESIGN_MODE == MODE_DN
               ? (_controller.value.isInitialized
-              ? AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: VideoPlayer(_controller),
-                )
+                  ? AspectRatio(
+                      aspectRatio: _controller.value.aspectRatio,
+                      child: VideoPlayer(_controller),
+                    )
                   : CircularProgressIndicator())
               : Stack(
                   children: [

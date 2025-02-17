@@ -128,9 +128,9 @@ class _PathFind extends State<PathFind> {
                     backgroundColor: Colors.transparent, // 背景色を透明に設定
                     shadowColor: Colors.transparent, // 影の色を透明に設定
                   ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                   child: SizedBox(
                     //width: MediaQuery.of(context).size.width * 0.1,
                     height: MediaQuery.of(context).size.height * 0.1,
@@ -185,17 +185,17 @@ class _PathFind extends State<PathFind> {
                           value:
                               moucePathMode[0] == PATH_MODE_OFF ? false : true,
                           onChanged: (bool value) {
-                        setState(() {
+                            setState(() {
                               moucePathMode[0] =
                                   value ? PATH_MODE_AUTO : PATH_MODE_OFF;
                               if (value) {
-                            arrowsAll[0].clear();
+                                arrowsAll[0].clear();
                                 arrowsAll[0].add(Arrow(0, 0, 0));
-                          } else {
-                            arrowsAll[0].clear();
-                          }
-                        });
-                      },
+                              } else {
+                                arrowsAll[0].clear();
+                              }
+                            });
+                          },
                           activeColor: Colors.red, // スイッチのアクティブカラーを赤色に設定
                         ),
                       ),
@@ -212,18 +212,18 @@ class _PathFind extends State<PathFind> {
                           value:
                               moucePathMode[1] == PATH_MODE_OFF ? false : true,
                           onChanged: (bool value) {
-                        setState(() {
+                            setState(() {
                               moucePathMode[1] =
                                   value ? PATH_MODE_AUTO : PATH_MODE_OFF;
                               if (value) {
-                            arrowsAll[1].clear();
+                                arrowsAll[1].clear();
                                 arrowsAll[1]
                                     .add(Arrow(0, MAZE_SIZE - 1, DIR_UP));
-                          } else {
-                            arrowsAll[1].clear();
-                          }
-                        });
-                      },
+                              } else {
+                                arrowsAll[1].clear();
+                              }
+                            });
+                          },
                           activeColor: Colors.blue, // スイッチのアクティブカラーを赤色に設定
                         ),
                       ),
@@ -240,18 +240,18 @@ class _PathFind extends State<PathFind> {
                           value:
                               moucePathMode[2] == PATH_MODE_OFF ? false : true,
                           onChanged: (bool value) {
-                        setState(() {
+                            setState(() {
                               moucePathMode[2] =
                                   value ? PATH_MODE_AUTO : PATH_MODE_OFF;
                               if (value) {
-                            arrowsAll[2].clear();
+                                arrowsAll[2].clear();
                                 arrowsAll[2]
                                     .add(Arrow(MAZE_SIZE - 1, 0, DIR_DWN));
-                          } else {
-                            arrowsAll[2].clear();
-                          }
-                        });
-                      },
+                              } else {
+                                arrowsAll[2].clear();
+                              }
+                            });
+                          },
                           activeColor: Colors.green, // スイッチのアクティブカラーを赤色に設定
                         ),
                       ),
@@ -268,18 +268,18 @@ class _PathFind extends State<PathFind> {
                           value:
                               moucePathMode[3] == PATH_MODE_OFF ? false : true,
                           onChanged: (bool value) {
-                        setState(() {
+                            setState(() {
                               moucePathMode[3] =
                                   value ? PATH_MODE_AUTO : PATH_MODE_OFF;
                               if (value) {
-                            arrowsAll[3].clear();
+                                arrowsAll[3].clear();
                                 arrowsAll[3].add(Arrow(
                                     MAZE_SIZE - 1, MAZE_SIZE - 1, DIR_LFT));
-                          } else {
-                            arrowsAll[3].clear();
-                          }
-                        });
-                      },
+                              } else {
+                                arrowsAll[3].clear();
+                              }
+                            });
+                          },
                           activeColor: Colors.yellow, // スイッチのアクティブカラーを赤色に設定
                         ),
                       ),
@@ -482,4 +482,53 @@ class _PathFind extends State<PathFind> {
       print('Error connecting to server: $e');
     }
   }
+}
+
+void handleTap(BuildContext context) async {
+  sendMsg("mode:pathFind");
+  print("mode:pathFind");
+  List<Arrow> objs = [];
+  List<List<Arrow>> paths = [
+    [],
+    [],
+    [],
+    [],
+  ];
+
+  final response = await sendRecvMsg("get_path");
+  if (response != "") {
+    final jsonResponse = json.decode(response);
+
+    jsonResponse['objs'].forEach((obj) {
+      objs.add(Arrow(obj['x'], obj['y'], 0));
+    });
+  }
+
+  final path_set = await sendRecvMsg("get_auto_path");
+  if (path_set != "") {
+    final jsonResponse = json.decode(path_set);
+
+    jsonResponse['mouce0'].forEach((node) {
+      paths[0].add(Arrow(node['x'], node['y'], 0));
+    });
+    jsonResponse['mouce1'].forEach((node) {
+      paths[1].add(Arrow(node['x'], node['y'], 0));
+    });
+    jsonResponse['mouce2'].forEach((node) {
+      paths[2].add(Arrow(node['x'], node['y'], 0));
+    });
+    jsonResponse['mouce3'].forEach((node) {
+      paths[3].add(Arrow(node['x'], node['y'], 0));
+    });
+  }
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => PathFind(objs: objs, paths: paths),
+    ),
+  ).then((value) {
+    print("mode:objRecg");
+    sendMsg("mode:objRecg");
+  });
 }
